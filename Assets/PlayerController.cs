@@ -4,14 +4,39 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    [field: SerializeField]    
+    public Camera camera1 { get; private set; }
+    [field: SerializeField]
+    public Camera camera2 { get; private set; }
     [field: SerializeField]
     public float speed { get; private set; }
+
+    bool isCameraSwappable = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        camera1.enabled = true;
+        camera2.enabled = false;
+
     }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "CameraSwap")
+        {
+            swapCamera();
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "CameraSwap")
+        {
+            swapCamera();
+        }
+    }
+
 
     public void CreateStaticCopy()
     {
@@ -51,6 +76,7 @@ public class PlayerController : MonoBehaviour
         {
             CreateStaticCopy();
         }
+
     }
     
     void FixedUpdate()
@@ -83,6 +109,13 @@ public class PlayerController : MonoBehaviour
         }
 
         // Gravity
+    }
+
+
+    void swapCamera()
+    {
+            camera1.enabled = !camera1.enabled;
+            camera2.enabled = !camera2.enabled;
     }
 
     void resolveGravity()
