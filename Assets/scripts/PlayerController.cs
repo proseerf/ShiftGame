@@ -41,7 +41,9 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        //user cam
         camera1.enabled = true;
+        //theatre view cam
         camera2.enabled = false;
     }
 
@@ -132,6 +134,23 @@ public class PlayerController : MonoBehaviour
             MovementInput.y -= 1f;
 
         MovementInput = Vector3.ClampMagnitude(MovementInput, 1f);
+        
+        // if using player cam (not in theatre view), move based on camera view not world view
+        if (camera1 != null && camera1.enabled)
+        {
+            Vector3 camForward = camera1.transform.forward;
+            Vector3 camRight = camera1.transform.right;
+
+            camForward.y = 0f;
+            camRight.y = 0f;
+            camForward.Normalize();
+            camRight.Normalize();
+
+            MovementInput =
+                camRight * MovementInput.x
+                + camForward * MovementInput.z
+                + Vector3.up * MovementInput.y;
+        }
 
         // Request a jump once, rather than continuously
         if (Input.GetKeyDown(KeyCode.Space))
