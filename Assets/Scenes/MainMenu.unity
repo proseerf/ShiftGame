@@ -507,7 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c4a5c2af0a65e40b9aaa581a12d822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPlayPress
-  sceneToLoad: SampleScene
+  sceneToLoad: TheatreScene
 --- !u!1 &991018402
 GameObject:
   m_ObjectHideFlags: 0
