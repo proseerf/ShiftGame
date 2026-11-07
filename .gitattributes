@@ -169,3 +169,6 @@ Packages/packages-lock.json linguist-generated
 
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+
+# Small template icon: store normally, not in Git LFS
+Assets/TutorialInfo/Icons/URP.png !filter !diff !merge -text
