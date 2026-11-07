@@ -8,6 +8,7 @@ TagManager:
   - PlayerSubmissions
   - CameraSwap
   - CameraSwapTab
+  - copyable
   layers:
   - Default
   - TransparentFX

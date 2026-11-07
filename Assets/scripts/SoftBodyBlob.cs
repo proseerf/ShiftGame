@@ -12,7 +12,6 @@ public class SoftBodyBlob : MonoBehaviour
     [Range(4, 16)] public int rings = 8;
 
     [Header("Physics")]
-    public float gravity = 9.81f;
     public float stiffness = 0.85f;
     public float volumeStiffness = 0.8f;
     public float damping = 0.99f;
@@ -45,6 +44,11 @@ public class SoftBodyBlob : MonoBehaviour
 
     float originalVolume;
     public bool grounded;
+    public bool copyable;
+
+    public GameObject selectedObject;
+
+    private bool blobHidden = false;
 
     void Start()
     {
@@ -76,21 +80,36 @@ public class SoftBodyBlob : MonoBehaviour
             previous[i] = positions[i];
 
             Vector3 acceleration =
-                Vector3.down * gravity +
+                Vector3.down * playerController.gravity +
                 playerController.MovementInput * playerController.moveForce;
 
             positions[i] += velocity + acceleration * dt * dt;
         }
 
         // Jump
-        if (playerController.JumpRequested && grounded)
+        if (playerController.JumpRequested)
         {
-            for (int i = 0; i < previous.Length; i++)
+            if (grounded)
             {
-                previous[i] -= Vector3.up * playerController.jumpForce * dt;
+                for (int i = 0; i < previous.Length; i++)
+                {
+                    previous[i] -= Vector3.up * playerController.jumpForce * dt;
+                }   
             }
-
             playerController.ConsumeJumpRequest();
+        }
+
+        // Copy
+        if (playerController.CopyRequested)
+        {
+            if(copyable)
+            {
+                // Hide the original
+                HideBlob();
+                playerController.ShapeShift(gameObject, selectedObject);
+                Debug.Log("touching copyable object");
+            }
+            playerController.ConsumeCopyRequest();
         }
 
         // Solve constraints
@@ -101,6 +120,7 @@ public class SoftBodyBlob : MonoBehaviour
             SolveDistanceConstraints();
             SolveVolumeConstraint();
             SolveGroundCollision();
+            SolveCopyableCollision();
             SolveObstacleCollisions();
         }
 
@@ -215,6 +235,44 @@ public class SoftBodyBlob : MonoBehaviour
             positions.Length + " particles.");
     }
 
+    public void HideBlob()
+    {
+        blobHidden = true;
+
+        // Hide the rendered mesh
+        GetComponent<MeshRenderer>().enabled = false;
+
+        // Stop the physics simulation
+        enabled = false;
+
+        // Disable any colliders attached to the blob
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+
+        // Disable the collision probe
+        if (collisionProbe != null)
+            collisionProbe.enabled = false;
+    }
+
+    public void ShowBlob()
+    {
+        blobHidden = false;
+
+        GetComponent<MeshRenderer>().enabled = true;
+
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = true;
+        }
+
+        if (collisionProbe != null)
+            collisionProbe.enabled = true;
+
+        enabled = true;
+    }
+
     void AddEdge(int a, int b, HashSet<string> edgeSet)
     {
         int min = Mathf.Min(a, b);
@@ -325,6 +383,37 @@ public class SoftBodyBlob : MonoBehaviour
                     continue;
 
                 grounded = true;
+                break;
+            }
+        }
+    }
+
+    void SolveCopyableCollision()
+    {
+        copyable = false;
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            Vector3 worldPosition =
+                transform.TransformPoint(positions[i]);
+
+            Collider[] nearby = Physics.OverlapSphere(
+                worldPosition,
+                particleRadius
+            );
+
+            foreach (Collider other in nearby)
+            {
+                if (!other.CompareTag("copyable"))
+                    continue;
+
+                copyable = true;
+                selectedObject = other.gameObject;
+                // float highlightFactor = 0.2f;
+                // Renderer r = other.GetComponent(typeof(Renderer)) as Renderer;
+		        // Color oldColor = r.material.GetColor("_Color");
+		        // Color newColor = new Color(oldColor.r + highlightFactor, oldColor.g +highlightFactor, oldColor.b + highlightFactor, oldColor.a);
+		        // r.material.SetColor("_Color", newColor);
                 break;
             }
         }
