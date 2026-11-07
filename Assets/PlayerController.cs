@@ -11,6 +11,11 @@ public class PlayerController : MonoBehaviour
     [field: SerializeField]
     public float speed { get; private set; }
 
+    [field: SerializeField]
+    Vector3 theatreLocation = new Vector3(0,0,0);
+
+    Vector3 buttonLocation = new Vector3(0,0,0);
+
     bool isCameraSwappable = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -25,7 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "CameraSwap")
         {
-            swapCamera();
+            isCameraSwappable = true;
         }
     }
 
@@ -33,7 +38,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "CameraSwap")
         {
-            swapCamera();
+            isCameraSwappable = false;
         }
     }
 
@@ -72,9 +77,23 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.X))
+        if(Input.GetKeyDown(KeyCode.X) && camera2.enabled == true)
         {
             CreateStaticCopy();
+            swapCamera();
+            returnToButton();
+        }
+        if(Input.GetKeyDown(KeyCode.Tab) && isCameraSwappable)
+        {
+            swapCamera();
+            if(camera2.enabled == true)
+            {
+                goToTheatreDisplay();
+            }
+            else
+            {
+                returnToButton();
+            }
         }
 
     }
@@ -116,9 +135,17 @@ public class PlayerController : MonoBehaviour
     {
         camera1.enabled = !camera1.enabled;
         camera2.enabled = !camera2.enabled;
-        // Matrix4x4 mat = Camera.main.projectionMatrix;
-        // mat *= Matrix4x4.Scale(new Vector3(-1, 1, 1));
-        // Camera.main.projectionMatrix = mat;
+    }
+
+    void goToTheatreDisplay()
+    {
+        buttonLocation = transform.position;
+        transform.position = theatreLocation;
+    }
+
+    void returnToButton()
+    {
+        transform.position = buttonLocation;
     }
 
     void resolveGravity()
