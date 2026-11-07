@@ -44,7 +44,6 @@ public class SoftBodyBlob : MonoBehaviour
     Mesh mesh;
 
     float originalVolume;
-    //Vector3 movement;
     public bool grounded;
 
     void Start()
@@ -60,37 +59,6 @@ public class SoftBodyBlob : MonoBehaviour
 
     void Update()
     {
-        // movement = Vector3.zero;
-
-        // if (Keyboard.current != null)
-        // {
-        //     if (Keyboard.current.aKey.isPressed ||
-        //         Keyboard.current.leftArrowKey.isPressed)
-        //         movement.x -= 1f;
-
-        //     if (Keyboard.current.dKey.isPressed ||
-        //         Keyboard.current.rightArrowKey.isPressed)
-        //         movement.x += 1f;
-
-        //     if (Keyboard.current.wKey.isPressed ||
-        //         Keyboard.current.upArrowKey.isPressed)
-        //         movement.z += 1f;
-
-        //     if (Keyboard.current.sKey.isPressed ||
-        //         Keyboard.current.downArrowKey.isPressed)
-        //         movement.z -= 1f;
-
-        //     if (Keyboard.current.spaceKey.isPressed)
-        //         movement.y += 10f;
-
-        //     if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded)
-        //     {
-        //         for (int i = 0; i < previous.Length; i++)
-        //             previous[i] -= Vector3.up * jumpForce * Time.fixedDeltaTime;
-        //     }
-        // }
-
-        // movement = Vector3.ClampMagnitude(movement, 1f);
     }
 
     void FixedUpdate()
