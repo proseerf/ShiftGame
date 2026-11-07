@@ -114,8 +114,11 @@ public class PlayerController : MonoBehaviour
 
     void swapCamera()
     {
-            camera1.enabled = !camera1.enabled;
-            camera2.enabled = !camera2.enabled;
+        camera1.enabled = !camera1.enabled;
+        camera2.enabled = !camera2.enabled;
+        // Matrix4x4 mat = Camera.main.projectionMatrix;
+        // mat *= Matrix4x4.Scale(new Vector3(-1, 1, 1));
+        // Camera.main.projectionMatrix = mat;
     }
 
     void resolveGravity()
