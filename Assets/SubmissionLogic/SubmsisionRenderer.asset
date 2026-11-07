@@ -32,13 +32,13 @@ MonoBehaviour:
   m_AssetVersion: 3
   m_PrepassLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   m_OpaqueLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
@@ -70,14 +70,14 @@ MonoBehaviour:
   m_Active: 1
   settings:
     passTag: RenderObjects
-    Event: 250
+    Event: 300
     filterSettings:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 64
       PassNames: []
-    overrideMaterial: {fileID: 10756, guid: 0000000000000000e000000000000000, type: 0}
+    overrideMaterial: {fileID: 2100000, guid: 172f675576881d6469fd7aa437e81896, type: 2}
     overrideMaterialPassIndex: 0
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
