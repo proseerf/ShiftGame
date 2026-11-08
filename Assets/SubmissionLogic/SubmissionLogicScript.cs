@@ -74,7 +74,7 @@ public class SubmissionLogicScript : MonoBehaviour
         {
             float score = (matchingPixels - (overspillPixels * overspillPenalty)) / totalGoalPixels;
             matchPercentage = Mathf.Clamp01(score);
-            Debug.Log(matchPercentage);
+            // Debug.Log(matchPercentage);
         }
 
     }

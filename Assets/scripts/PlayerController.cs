@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.Android;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,11 +11,11 @@ public class PlayerController : MonoBehaviour
     public Camera camera2 { get; private set; }
 
     [field: SerializeField]
-    Vector3 theatreLocation = new Vector3(0,0,0);
+    public Vector3 theatreLocation = new Vector3(0,0,0);
 
-    Vector3 buttonLocation = new Vector3(0,0,0);
+    public Vector3 buttonLocation = new Vector3(0,0,0);
 
-    bool isCameraSwappable = false;
+    public bool isCameraSwappable = false;
      [Header("Movement")]
     public float gravity = 9.81f;
      public float moveForce = 12f;
@@ -26,6 +27,14 @@ public class PlayerController : MonoBehaviour
     public bool JumpRequested { get; private set; }
 
     public bool CopyRequested { get; private set; }
+
+    // 0 - No teleport requested
+    // 1 - Go to Theatre Location
+    // 2 - Go to Button Location
+    public int TeleportRequested {get; set; }
+    private bool inSubmissionRoom = false;
+
+    public bool CloneRequested {get; set; }
 
     // Called by SoftBodyBlob after a jump has been processed
     public void ConsumeJumpRequest()
@@ -61,17 +70,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void CreateStaticCopy()
+    void RequestClone()
+    {
+        CloneRequested = true;
+    }
+
+    public void CreateStaticCopy(GameObject argGameObject, Transform argTransform)
     {
         // Create a copy of the current GameObject
         GameObject copy = Instantiate(
-            gameObject,
-            transform.position,
-            transform.rotation
+            argGameObject,
+            argTransform.position,
+            argTransform.rotation
         );
 
         // Keep the same scale
-        copy.transform.localScale = transform.lossyScale;
+        copy.transform.localScale = argTransform.lossyScale;
 
         // Remove everything except the mesh and renderer
         Component[] components = copy.GetComponents<Component>();
@@ -90,13 +104,15 @@ public class PlayerController : MonoBehaviour
 
         // Mark as static
         copy.isStatic = true;
+
+        CloneRequested = false;
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.X) && camera2.enabled == true)
+        if(Input.GetKeyDown(KeyCode.X) && inSubmissionRoom)
         {
-            CreateStaticCopy();
+            RequestClone();
             SwapCamera();
             returnToButton();
         }
@@ -153,16 +169,17 @@ public class PlayerController : MonoBehaviour
 
     void goToTheatreDisplay()
     {
-        buttonLocation = transform.position;
-        transform.position = theatreLocation;
+        TeleportRequested = 1;
+        inSubmissionRoom = true;
     }
 
     void returnToButton()
     {
-        transform.position = buttonLocation;
+        TeleportRequested = 2;
+        inSubmissionRoom = false;
     }
 
-        public void ShapeShift(GameObject currentObject, GameObject targetObject)
+    public void ShapeShift(GameObject currentObject, GameObject targetObject)
     {
         if (targetObject == null)
             return;
@@ -181,6 +198,8 @@ public class PlayerController : MonoBehaviour
         newObject.transform.position = currentObject.transform.position;
         newObject.transform.rotation = targetObject.transform.rotation;
         newObject.transform.localScale = targetObject.transform.localScale;
+        // Make layer PlayerSubmissions Layer
+        newObject.layer = 6;
 
         // Add mesh components
         MeshFilter newMeshFilter = newObject.AddComponent<MeshFilter>();

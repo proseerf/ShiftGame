@@ -111,6 +111,25 @@ public class SoftBodyBlob : MonoBehaviour
             }
             playerController.ConsumeCopyRequest();
         }
+        
+        if(playerController.CloneRequested)
+        {
+            playerController.CreateStaticCopy(gameObject, transform);
+        }
+
+        if(playerController.TeleportRequested != 0)
+        {
+            if(playerController.TeleportRequested == 1)
+            {
+            playerController.buttonLocation = transform.position;
+            transform.position = playerController.theatreLocation;
+            }
+            if(playerController.TeleportRequested == 2)
+            {
+                transform.position = playerController.buttonLocation;
+            }
+            playerController.TeleportRequested = 0;
+        }
 
         // Solve constraints
         for (int iteration = 0;
@@ -478,10 +497,12 @@ public class SoftBodyBlob : MonoBehaviour
                 worldPosition,
                 particleRadius
             );
+            
+            playerController.isCameraSwappable = false; 
 
             foreach (Collider other in nearby)
             {
-                if (other == collisionProbe || other.isTrigger == true)
+                if (other == collisionProbe)
                     continue;
 
                 if (other.transform == transform ||
@@ -501,9 +522,19 @@ public class SoftBodyBlob : MonoBehaviour
 
                 if (penetrating)
                 {
+
+                    if(other.isTrigger == true)
+                    {
+                        if (other.CompareTag("CameraSwap") && (playerController.isCameraSwappable == false))
+                        {
+                            playerController.isCameraSwappable = true;
+                        }
+                        continue;
+                    }
                     worldPosition += direction * distance;
                     collisionProbeObject.transform.position = worldPosition;
                 }
+
             }
 
             positions[i] = transform.InverseTransformPoint(worldPosition);
