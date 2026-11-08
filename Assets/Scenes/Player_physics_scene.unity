@@ -624,7 +624,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 1589749330}
   offset: {x: 0, y: 2, z: -5}
+  targetHeight: 1
+  mouseSensitivityX: 2
+  mouseSensitivityY: 1
+  minPitch: -20
+  maxPitch: 70
+  minDistance: 2
+  maxDistance: 12
+  zoomSpeed: 4
   smoothSpeed: 5
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.2
 --- !u!1 &1298127215
 GameObject:
   m_ObjectHideFlags: 0
@@ -1004,7 +1016,7 @@ MonoBehaviour:
   volumeStiffness: 0.4
   damping: 0.99
   particleMass: 1
-  solverIterations: 6
+  solverIterations: 1
   particleRadius: 0.1
   playerController: {fileID: 1589749332}
   grounded: 0
