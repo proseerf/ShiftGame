@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SoftBodyBlob : MonoBehaviour
@@ -46,8 +47,6 @@ public class SoftBodyBlob : MonoBehaviour
     public bool grounded;
     public bool copyable;
 
-    public Vector3? TempVelocity {get; set;} = null;
-
     public GameObject selectedObject;
 
     void Start()
@@ -76,11 +75,6 @@ public class SoftBodyBlob : MonoBehaviour
         {
             Vector3 velocity =
             (positions[i] - previous[i]) * damping;
-            if(TempVelocity != null)
-            {
-                velocity = TempVelocity.Value;
-                TempVelocity = null;
-            }
 
             previous[i] = positions[i];
 
@@ -138,6 +132,17 @@ public class SoftBodyBlob : MonoBehaviour
 
         RecenterBlob();
         UpdateMesh();
+    }
+
+    public void SetVelocity(Vector3 velocity)
+    {
+        Vector3 localVelocity = transform.InverseTransformVector(velocity);
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            previous[i] = positions[i] -
+                (localVelocity / damping) * Time.fixedDeltaTime;
+        }
     }
 
     
@@ -402,6 +407,7 @@ public class SoftBodyBlob : MonoBehaviour
     void SolveCopyableCollision()
     {
         copyable = false;
+        selectedObject = null;
 
         for (int i = 0; i < positions.Length; i++)
         {
@@ -420,11 +426,11 @@ public class SoftBodyBlob : MonoBehaviour
 
                 copyable = true;
                 selectedObject = other.gameObject;
-                // float highlightFactor = 0.2f;
-                // Renderer r = other.GetComponent(typeof(Renderer)) as Renderer;
-		        // Color oldColor = r.material.GetColor("_Color");
-		        // Color newColor = new Color(oldColor.r + highlightFactor, oldColor.g +highlightFactor, oldColor.b + highlightFactor, oldColor.a);
-		        // r.material.SetColor("_Color", newColor);
+
+                // Material currentMat = gameObject.GetComponent<MeshRenderer>().materials[1];
+                // selectedObject.GetComponent<MeshRenderer>().materials = 
+                //     selectedObject.GetComponent<MeshRenderer>().materials.Append(currentMat).ToArray();
+
                 break;
             }
         }

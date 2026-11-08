@@ -1,10 +1,14 @@
 using System.Reflection.Metadata;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ShapeShiftedPlayer : MonoBehaviour
 {
     public bool grounded;
     public bool copyable;
+
+    private HashSet<Collider> groundContacts = new HashSet<Collider>();
+    private HashSet<Collider> copyableContacts = new HashSet<Collider>();
 
     public GameObject selectedObject;
 
@@ -66,14 +70,15 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
             // Position the blob where the shapeshifted object is
             playerController.blobObject.transform.position = transform.position;
-            playerController.blobObject.transform.rotation = transform.rotation;
+            //playerController.blobObject.transform.rotation = transform.rotation;
             playerController.blobObject.transform.localScale = transform.localScale;
 
             // Transfer velocity to the blob
             SoftBodyBlob blob =
                 playerController.blobObject.GetComponent<SoftBodyBlob>();
 
-            blob.TempVelocity = rb.linearVelocity;
+            Debug.Log("setting velocity: " + rb.linearVelocity);
+            blob.SetVelocity(rb.linearVelocity);
 
             // Switch camera target
             Camera.main.GetComponent<CameraFollow>().target =
@@ -91,18 +96,60 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        grounded = false;
-        copyable = false;
-        if (collision.collider.CompareTag("Ground")){
+        Collider other = collision.collider;
+
+        if (other.CompareTag("Ground"))
+        {
+            groundContacts.Add(other);
             grounded = true;
         }
 
-        if (collision.collider.CompareTag("copyable"))
+        if (other.CompareTag("copyable"))
         {
-            selectedObject = collision.gameObject;
-            copyable = true;
+            copyableContacts.Add(other);
+            UpdateSelectedObject();
         }
     }
+
+    void OnCollisionExit(Collision collision)
+    {
+        Collider other = collision.collider;
+
+        if (other.CompareTag("Ground"))
+        {
+            groundContacts.Remove(other);
+            grounded = groundContacts.Count > 0;
+        }
+
+        if (other.CompareTag("copyable"))
+        {
+            copyableContacts.Remove(other);
+            UpdateSelectedObject();
+        }
+    }
+
+    void UpdateSelectedObject()
+    {
+        copyableContacts.RemoveWhere(c => c == null);
+
+        copyable = copyableContacts.Count > 0;
+
+        if (copyable)
+        {
+            selectedObject = null;
+
+            foreach (Collider col in copyableContacts)
+            {
+                selectedObject = col.gameObject;
+                break;
+            }
+        }
+        else
+        {
+            selectedObject = null;
+        }
+    }
+
     void returnToBlob()
     {
         
