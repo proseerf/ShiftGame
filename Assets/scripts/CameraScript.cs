@@ -37,9 +37,6 @@ public class CameraFollow : MonoBehaviour
         Vector3 dir = -offset.normalized;
         yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         pitch = Mathf.Asin(Mathf.Clamp(-dir.y, -1f, 1f)) * Mathf.Rad2Deg;
-    
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         if (target != null)
             smoothFocus = target.position + Vector3.up * targetHeight;
@@ -66,7 +63,7 @@ public class CameraFollow : MonoBehaviour
         }
 
         // Edit cam via mouse if mouse is being captured
-        if (Cursor.lockState == CursorLockMode.Locked)
+        if (!PauseMenu.IsPaused)
         {
             yaw += Input.GetAxis("Mouse X") * mouseSensitivityX;
             pitch -= Input.GetAxis("Mouse Y") * mouseSensitivityY;
