@@ -1,8 +1,12 @@
+using System.Reflection.Metadata;
 using UnityEngine;
 
 public class ShapeShiftedPlayer : MonoBehaviour
 {
     public bool grounded;
+    public bool copyable;
+
+    public GameObject selectedObject;
 
     [Header("controller")]
     [SerializeField] public PlayerController playerController;
@@ -40,16 +44,63 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
                 rb.AddForce(jump, ForceMode.VelocityChange);
             }
-            
-            playerController.ConsumeJumpRequest();
+
+            playerController.JumpRequested = false;
+        }
+
+        // Copy
+        if (playerController.CopyRequested)
+        {
+            if(copyable)
+            {
+                playerController.ShapeShift(gameObject,selectedObject);
+            }
+            playerController.CopyRequested = false;
+        }
+
+        // Reform
+        if (playerController.ReformRequested)
+        {
+            // Save the current Rigidbody velocity BEFORE destroying the object
+            Vector3 currentVelocity = rb.linearVelocity;
+
+            // Position the blob where the shapeshifted object is
+            playerController.blobObject.transform.position = transform.position;
+            playerController.blobObject.transform.rotation = transform.rotation;
+            playerController.blobObject.transform.localScale = transform.localScale;
+
+            // Transfer velocity to the blob
+            SoftBodyBlob blob =
+                playerController.blobObject.GetComponent<SoftBodyBlob>();
+
+            blob.TempVelocity = rb.linearVelocity;
+
+            // Switch camera target
+            Camera.main.GetComponent<CameraFollow>().target =
+                playerController.blobObject.transform;
+
+            // Destroy shapeshifted object
+            Destroy(gameObject);
+
+            // Show blob
+            blob.ShowBlob();
+
+            playerController.ReformRequested = false;
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
         grounded = false;
+        copyable = false;
         if (collision.collider.CompareTag("Ground")){
             grounded = true;
+        }
+
+        if (collision.collider.CompareTag("copyable"))
+        {
+            selectedObject = collision.gameObject;
+            copyable = true;
         }
     }
     void returnToBlob()
