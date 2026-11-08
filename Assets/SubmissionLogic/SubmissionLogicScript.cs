@@ -23,11 +23,11 @@ public class SubmissionLogicScript : MonoBehaviour
     {
         CalculateFill();
 
-        // Press Spacebar in Play Mode to export both renders to PNG
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            ExportRendersToPNG();
-        }
+        // Press X in Play Mode to export both renders to PNG
+        // if (Input.GetKeyDown(KeyCode.X))
+        // {
+        //     ExportRendersToPNG();
+        // }
     }
 
 
