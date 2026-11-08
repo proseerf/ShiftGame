@@ -96,6 +96,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // no update if paused
+        if (PauseMenu.IsPaused)
+        {
+            MovementInput = Vector3.zero;
+            return;
+        }
+
         if(Input.GetKeyDown(KeyCode.X) && camera2.enabled == true)
         {
             CreateStaticCopy();
