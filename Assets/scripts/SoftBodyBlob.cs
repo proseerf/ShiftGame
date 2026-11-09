@@ -82,7 +82,7 @@ public class SoftBodyBlob : MonoBehaviour
                 Vector3.down * playerController.gravity +
                 playerController.MovementInput * playerController.moveForce;
 
-            Debug.Log("Velocity: " + velocity + " acceleration " + acceleration);
+            //Debug.Log("Velocity: " + velocity + " acceleration " + acceleration);
 
             positions[i] += velocity + acceleration * dt * dt;
         }
