@@ -51,7 +51,7 @@ public class ShapeShiftedPlayer : MonoBehaviour
         // Movement and gravity
         rb.AddForce(acceleration, ForceMode.Acceleration);
 
-        Debug.Log(flatVelocity.magnitude);
+        //Debug.Log(flatVelocity.magnitude);
 
         // Jump
         if (playerController.JumpRequested)

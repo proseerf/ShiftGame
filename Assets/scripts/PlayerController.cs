@@ -210,6 +210,8 @@ public class PlayerController : MonoBehaviour
 
         // Assign the same mesh and materials
         newMeshFilter.sharedMesh = copiedMeshFilter.sharedMesh;
+
+        //don't change material
         newMeshRenderer.sharedMaterials = currentObject.GetComponent<MeshRenderer>().sharedMaterials;
 
         ShapeShiftedPlayer newControls = newObject.AddComponent<ShapeShiftedPlayer>();
