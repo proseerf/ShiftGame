@@ -20,24 +20,17 @@ public class PlayerController : MonoBehaviour
      public float moveForce = 12f;
      public float jumpForce = 5f;
 
+    //hate this circular reference
+    public GameObject blobObject;
+
     // Movement input supplied to SoftBodyBlob
     public Vector3 MovementInput;
 
-    public bool JumpRequested { get; private set; }
+    public bool JumpRequested { get;  set; }
 
-    public bool CopyRequested { get; private set; }
+    public bool CopyRequested { get;  set; }
 
-    // Called by SoftBodyBlob after a jump has been processed
-    public void ConsumeJumpRequest()
-    {
-        JumpRequested = false;
-    }
-
-    // Called by SoftBodyBlob after a jump has been processed
-    public void ConsumeCopyRequest()
-    {
-        CopyRequested = false;
-    }
+    public bool ReformRequested { get;  set; }
 
     void Start()
     {
@@ -162,6 +155,12 @@ public class PlayerController : MonoBehaviour
         {
             CopyRequested = true;
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log("r pressed");
+            ReformRequested = true;
+        }
     }
 
     void SwapCamera()
@@ -181,10 +180,13 @@ public class PlayerController : MonoBehaviour
         transform.position = buttonLocation;
     }
 
-        public void ShapeShift(GameObject currentObject, GameObject targetObject)
+        public void ShapeShift(GameObject currentObject, GameObject targetObject, bool destroyMode = true)
     {
         if (targetObject == null)
+        {
             return;
+        }
+            
 
         // Get the original mesh components
         MeshFilter copiedMeshFilter = targetObject.GetComponent<MeshFilter>();
@@ -231,6 +233,9 @@ public class PlayerController : MonoBehaviour
         }
 
         Camera.main.GetComponent<CameraFollow>().target = newObject.transform;
+
+        if(destroyMode)
+            Destroy(currentObject);
     }
 
     private void patternMatchCollider(Collider copiedCollider, Collider newCollider)
