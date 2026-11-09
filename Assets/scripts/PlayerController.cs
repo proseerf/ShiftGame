@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     public float gravity = 9.81f;
      public float moveForce = 12f;
      public float jumpForce = 5f;
+     public float maxSpeed = 5f;
 
     //hate this circular reference
     public GameObject blobObject;

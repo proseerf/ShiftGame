@@ -28,16 +28,30 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
     void FixedUpdate()
     {
-        float dt = Time.fixedDeltaTime;
 
         Rigidbody rb = GetComponent<Rigidbody>();
 
-        Vector3 acceleration =
-            Vector3.down * playerController.gravity +
-            playerController.MovementInput * playerController.moveForce;
+        Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 acceleration; 
+
+        if(flatVelocity.magnitude >= playerController.maxSpeed)
+        {
+            acceleration =
+                Vector3.down * playerController.gravity;
+        }
+
+        else
+        {
+            acceleration =
+                Vector3.down * playerController.gravity +
+                playerController.MovementInput * playerController.moveForce;
+        }
+
 
         // Movement and gravity
         rb.AddForce(acceleration, ForceMode.Acceleration);
+
+        Debug.Log(flatVelocity.magnitude);
 
         // Jump
         if (playerController.JumpRequested)

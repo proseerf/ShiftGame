@@ -78,9 +78,22 @@ public class SoftBodyBlob : MonoBehaviour
 
             previous[i] = positions[i];
 
-            Vector3 acceleration =
-                Vector3.down * playerController.gravity +
-                playerController.MovementInput * playerController.moveForce;
+            Vector3 acceleration;
+
+            //since velocity is calculated differently on the soft body then the Rigidbody(verlet vs linear)
+            //the soft bodys velocity can be 0.2 while moving just as fast as the Rigidbody at something more like 5
+            //not a huge issue as the softbody doesn't have to worry about weird bouncing but something to note
+            if(velocity.magnitude <= playerController.maxSpeed)
+            {
+                acceleration =
+                    Vector3.down * playerController.gravity +
+                    playerController.MovementInput * playerController.moveForce;
+            }
+            else
+            {
+                acceleration =
+                    Vector3.down * playerController.gravity;
+            }
 
             //Debug.Log("Velocity: " + velocity + " acceleration " + acceleration);
 
