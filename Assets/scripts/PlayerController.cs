@@ -1,4 +1,5 @@
 
+using System.Reflection.Metadata;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -181,64 +182,153 @@ public class PlayerController : MonoBehaviour
         transform.position = buttonLocation;
     }
 
-        public void ShapeShift(GameObject currentObject, GameObject targetObject, bool destroyMode = true)
+    public void ShapeShift(
+        GameObject currentObject,
+        GameObject targetObject,
+        bool destroyMode = true)
     {
-        if (targetObject == null)
+        if (targetObject == null || currentObject == null)
+            return;
+
+        MeshFilter copiedMeshFilter =
+            targetObject.GetComponent<MeshFilter>();
+
+        Collider copiedCollider =
+            targetObject.GetComponent<Collider>();
+
+        SoftBodyBlob blob =
+            blobObject.GetComponent<SoftBodyBlob>();
+
+        if (copiedMeshFilter == null || blob == null)
+            return;
+
+        // Create temporary morph controller
+        GameObject morphObject = new GameObject("MorphObject");
+
+        MorphObject morph =
+            morphObject.AddComponent<MorphObject>();
+
+        // Calculate the morph
+        morph.Begin(
+            blobObject.transform,
+            blob.positions,
+            copiedMeshFilter.mesh,
+            targetObject.transform
+        );
+
+        // Animate the morph, then create the final object
+        StartCoroutine(FinishShapeShift(
+            currentObject,
+            targetObject,
+            copiedCollider,
+            destroyMode,
+            morph,
+            blob
+        ));
+    }
+
+    private System.Collections.IEnumerator FinishShapeShift(
+        GameObject currentObject,
+        GameObject targetObject,
+        Collider copiedCollider,
+        bool destroyMode,
+        MorphObject morph,
+        SoftBodyBlob blob)
+    {
+        // Animate the blob towards the target shape
+        while (!morph.IsComplete)
         {
-            return;
+            Vector3[] morphedPositions =
+                morph.Advance(Time.deltaTime);
+
+            // Apply the new positions to the blob
+            for (int i = 0; i < morphedPositions.Length; i++)
+            {
+                blob.positions[i] = morphedPositions[i];
+            }
+
+            yield return null;
         }
-            
 
-        // Get the original mesh components
-        MeshFilter copiedMeshFilter = targetObject.GetComponent<MeshFilter>();
-        Collider copiedCollider = targetObject.GetComponent<Collider>();
+        // Apply final positions
+        Vector3[] finalPositions = morph.CurrentPositions;
 
-        if (copiedMeshFilter == null)
-            return;
+        for (int i = 0; i < finalPositions.Length; i++)
+        {
+            blob.positions[i] = finalPositions[i];
+        }
 
-        // Create a new object
-        GameObject newObject = new GameObject(targetObject.name + "_Copy");
+        // Clean up the temporary morph controller
+        Destroy(morph.gameObject);
 
-        // Copy transform
-        newObject.transform.position = currentObject.transform.position;
-        newObject.transform.rotation = targetObject.transform.rotation;
-        newObject.transform.localScale = targetObject.transform.localScale;
+        if (currentObject == null || targetObject == null)
+            yield break;
+
+        // Create final object
+        GameObject newObject =
+            new GameObject(targetObject.name + "_Copy");
+
+        newObject.transform.position =
+            currentObject.transform.position;
+
+        newObject.transform.rotation =
+            targetObject.transform.rotation;
+
+        newObject.transform.localScale =
+            targetObject.transform.localScale;
 
         // Add mesh components
-        MeshFilter newMeshFilter = newObject.AddComponent<MeshFilter>();
-        MeshRenderer newMeshRenderer = newObject.AddComponent<MeshRenderer>();
+        MeshFilter newMeshFilter =
+            newObject.AddComponent<MeshFilter>();
 
-        // Assign the same mesh and materials
-        newMeshFilter.sharedMesh = copiedMeshFilter.sharedMesh;
+        MeshRenderer newMeshRenderer =
+            newObject.AddComponent<MeshRenderer>();
 
-        //don't change material
-        newMeshRenderer.sharedMaterials = currentObject.GetComponent<MeshRenderer>().sharedMaterials;
+        newMeshFilter.sharedMesh =
+            targetObject.GetComponent<MeshFilter>().sharedMesh;
 
-        ShapeShiftedPlayer newControls = newObject.AddComponent<ShapeShiftedPlayer>();
-        newControls.grounded=true;
+        newMeshRenderer.sharedMaterials =
+            currentObject.GetComponent<MeshRenderer>().sharedMaterials;
+
+        // Add controls
+        ShapeShiftedPlayer newControls =
+            newObject.AddComponent<ShapeShiftedPlayer>();
+
+        newControls.grounded = true;
         newControls.playerController = this;
 
-        Rigidbody rigidbody = newObject.AddComponent<Rigidbody>();
-        rigidbody.useGravity = false;
-        rigidbody.isKinematic = false;
+        // Add Rigidbody
+        Rigidbody rb =
+            newObject.AddComponent<Rigidbody>();
 
+        rb.useGravity = false;
+        rb.isKinematic = false;
 
-        Debug.Log("copied collider type:" + copiedCollider.GetType());
-        // Add a collider of the same type
+        // Copy collider
         if (copiedCollider != null)
         {
-            Collider newCollider = newObject.AddComponent(copiedCollider.GetType()) as Collider;
+            Collider newCollider =
+                newObject.AddComponent(copiedCollider.GetType()) as Collider;
 
-            // Copy collider settings
             newCollider.isTrigger = copiedCollider.isTrigger;
             newCollider.sharedMaterial = copiedCollider.sharedMaterial;
-            patternMatchCollider(copiedCollider,newCollider);
+
+            patternMatchCollider(copiedCollider, newCollider);
         }
 
-        Camera.main.GetComponent<CameraFollow>().target = newObject.transform;
+        // Update camera
+        Camera.main.GetComponent<CameraFollow>().target =
+            newObject.transform;
 
-        if(destroyMode)
+
+        // EyeTracking eyes = currentObject.GetComponent<EyeTracking>();
+        // EyeTracking neweyes = newObject.AddComponent<EyeTracking>();
+        // neweyes = eyes;
+        // Destroy original if requested
+        if (destroyMode)
             Destroy(currentObject);
+        else
+            blob.HideBlob();
     }
 
     private void patternMatchCollider(Collider copiedCollider, Collider newCollider)

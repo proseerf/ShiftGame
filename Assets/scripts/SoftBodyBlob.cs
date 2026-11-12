@@ -3,8 +3,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using System.Linq;
+using UnityEngine.InputSystem.XR;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer),typeof(EyeTracking))]
 public class SoftBodyBlob : MonoBehaviour
 {
     [Header("Blob Shape")]
@@ -34,7 +35,7 @@ public class SoftBodyBlob : MonoBehaviour
         public float restLength;
     }
 
-    Vector3[] positions;
+    public Vector3[] positions;
     Vector3[] previous;
     Vector3[] original;
     Vector3[] normals;
@@ -118,7 +119,7 @@ public class SoftBodyBlob : MonoBehaviour
         {
             if(copyable)
             {
-                HideBlob();
+                //HideBlob();
                 playerController.ShapeShift(gameObject, selectedObject, false);
                 Debug.Log("touching copyable object");
             }
@@ -175,6 +176,11 @@ public class SoftBodyBlob : MonoBehaviour
             col.enabled = false;
         }
 
+        EyeTracking eyes = GetComponent<EyeTracking>();
+        eyes.leftEye.GetComponent<MeshRenderer>().enabled = false;
+        eyes.rightEye.GetComponent<MeshRenderer>().enabled = false;
+
+
         // Disable the collision probe
         if (collisionProbe != null)
             collisionProbe.enabled = false;
@@ -188,6 +194,10 @@ public class SoftBodyBlob : MonoBehaviour
         {
             col.enabled = true;
         }
+
+        EyeTracking eyes = GetComponent<EyeTracking>();
+        eyes.leftEye.GetComponent<MeshRenderer>().enabled = true;
+        eyes.rightEye.GetComponent<MeshRenderer>().enabled = true;
 
         if (collisionProbe != null)
             collisionProbe.enabled = true;
