@@ -113,13 +113,11 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.X) && inSubmissionRoom)
         {
             RequestClone();
-            SwapCamera();
             returnToButton();
         }
         if(Input.GetKeyDown(KeyCode.Tab) && isCameraSwappable)
         {
-            SwapCamera();
-            if(camera2.enabled == true)
+            if(camera1.enabled == true)
             {
                 goToTheatreDisplay();
             }
@@ -160,6 +158,11 @@ public class PlayerController : MonoBehaviour
             CopyRequested = true;
         }
     }
+    public void ChangeViews()
+    {
+        SwapCamera();
+        inSubmissionRoom = !inSubmissionRoom;
+    }
 
     void SwapCamera()
     {
@@ -170,13 +173,11 @@ public class PlayerController : MonoBehaviour
     void goToTheatreDisplay()
     {
         TeleportRequested = 1;
-        inSubmissionRoom = true;
     }
 
     void returnToButton()
     {
         TeleportRequested = 2;
-        inSubmissionRoom = false;
     }
 
     public void ShapeShift(GameObject currentObject, GameObject targetObject)

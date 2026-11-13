@@ -53,14 +53,15 @@ public class ShapeShiftedPlayer : MonoBehaviour
         {
             if(playerController.TeleportRequested == 1)
             {
-            playerController.buttonLocation = transform.position;
-            transform.position = playerController.theatreLocation;
+                playerController.buttonLocation = transform.position;
+                transform.position = playerController.theatreLocation;
             }
             if(playerController.TeleportRequested == 2)
             {
                 transform.position = playerController.buttonLocation;
             }
             playerController.TeleportRequested = 0;
+            playerController.ChangeViews();
         }
     }
 

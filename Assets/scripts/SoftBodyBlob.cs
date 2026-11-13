@@ -117,17 +117,9 @@ public class SoftBodyBlob : MonoBehaviour
             playerController.CreateStaticCopy(gameObject, transform);
         }
 
+        // Shouldnt teleport as a softbody
         if(playerController.TeleportRequested != 0)
         {
-            if(playerController.TeleportRequested == 1)
-            {
-            playerController.buttonLocation = transform.position;
-            transform.position = playerController.theatreLocation;
-            }
-            if(playerController.TeleportRequested == 2)
-            {
-                transform.position = playerController.buttonLocation;
-            }
             playerController.TeleportRequested = 0;
         }
 
