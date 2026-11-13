@@ -23,11 +23,11 @@ public class SubmissionLogicScript : MonoBehaviour
     {
         CalculateFill();
 
-        // Press Spacebar in Play Mode to export both renders to PNG
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            ExportRendersToPNG();
-        }
+        // Press X in Play Mode to export both renders to PNG
+        // if (Input.GetKeyDown(KeyCode.X))
+        // {
+        //     ExportRendersToPNG();
+        // }
     }
 
 
@@ -74,7 +74,7 @@ public class SubmissionLogicScript : MonoBehaviour
         {
             float score = (matchingPixels - (overspillPixels * overspillPenalty)) / totalGoalPixels;
             matchPercentage = Mathf.Clamp01(score);
-            Debug.Log(matchPercentage);
+            // Debug.Log(matchPercentage);
         }
 
     }

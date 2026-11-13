@@ -131,6 +131,17 @@ public class SoftBodyBlob : MonoBehaviour
         {
             playerController.ReformRequested = false;
         }
+        
+        if(playerController.CloneRequested)
+        {
+            playerController.CreateStaticCopy(gameObject, transform);
+        }
+
+        // Shouldnt teleport as a softbody
+        if(playerController.TeleportRequested != 0)
+        {
+            playerController.TeleportRequested = 0;
+        }
 
         // Solve constraints
         for (int iteration = 0;
@@ -516,10 +527,12 @@ public class SoftBodyBlob : MonoBehaviour
                 worldPosition,
                 particleRadius
             );
+            
+            playerController.isCameraSwappable = false; 
 
             foreach (Collider other in nearby)
             {
-                if (other == collisionProbe || other.isTrigger == true)
+                if (other == collisionProbe)
                     continue;
 
                 if (other.transform == transform ||
@@ -539,9 +552,19 @@ public class SoftBodyBlob : MonoBehaviour
 
                 if (penetrating)
                 {
+
+                    if(other.isTrigger == true)
+                    {
+                        if (other.CompareTag("CameraSwap") && (playerController.isCameraSwappable == false))
+                        {
+                            playerController.isCameraSwappable = true;
+                        }
+                        continue;
+                    }
                     worldPosition += direction * distance;
                     collisionProbeObject.transform.position = worldPosition;
                 }
+
             }
 
             positions[i] = transform.InverseTransformPoint(worldPosition);

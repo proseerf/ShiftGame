@@ -65,6 +65,26 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
             playerController.JumpRequested = false;
         }
+        
+        if(playerController.CloneRequested)
+        {
+            playerController.CreateStaticCopy(gameObject, transform);
+        }
+
+        if(playerController.TeleportRequested != 0)
+        {
+            if(playerController.TeleportRequested == 1)
+            {
+                playerController.buttonLocation = transform.position;
+                transform.position = playerController.theatreLocation;
+            }
+            if(playerController.TeleportRequested == 2)
+            {
+                transform.position = playerController.buttonLocation;
+            }
+            playerController.TeleportRequested = 0;
+            playerController.ChangeViews();
+        }
 
         // Copy
         if (playerController.CopyRequested)
@@ -134,6 +154,21 @@ public class ShapeShiftedPlayer : MonoBehaviour
         }
     }
 
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("CameraSwap"))
+        {
+            playerController.isCameraSwappable = true;
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("CameraSwap"))
+        {
+            playerController.isCameraSwappable = false;
+        }
+    }
     void OnCollisionExit(Collision collision)
     {
         Collider other = collision.collider;
