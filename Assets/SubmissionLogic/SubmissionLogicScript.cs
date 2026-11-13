@@ -22,12 +22,6 @@ public class SubmissionLogicScript : MonoBehaviour
     void Update()
     {
         CalculateFill();
-
-        // Press X in Play Mode to export both renders to PNG
-        // if (Input.GetKeyDown(KeyCode.X))
-        // {
-        //     ExportRendersToPNG();
-        // }
     }
 
 
@@ -61,7 +55,10 @@ public class SubmissionLogicScript : MonoBehaviour
             if (isGoal)
             {
                 totalGoalPixels++;
-                if (isShadow) matchingPixels++;
+                if (isShadow) 
+                {
+                    matchingPixels++;
+                }
             }
             else if (isShadow)
             {
@@ -73,8 +70,11 @@ public class SubmissionLogicScript : MonoBehaviour
         if (totalGoalPixels > 0)
         {
             float score = (matchingPixels - (overspillPixels * overspillPenalty)) / totalGoalPixels;
-            matchPercentage = Mathf.Clamp01(score);
-            // Debug.Log(matchPercentage);
+            matchPercentage = Mathf.Clamp01(score) * 100;
+        }
+        if(matchPercentage > 80)
+        {
+            Debug.Log("YOU WIN: " + matchPercentage + "% filled");
         }
 
     }

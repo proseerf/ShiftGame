@@ -1,6 +1,7 @@
 using System.Reflection.Metadata;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 public class ShapeShiftedPlayer : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class ShapeShiftedPlayer : MonoBehaviour
     private HashSet<Collider> copyableContacts = new HashSet<Collider>();
 
     public GameObject selectedObject;
+    private bool inTheatre = false;
 
     [Header("controller")]
     [SerializeField] public PlayerController playerController;
@@ -28,42 +30,82 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
     void FixedUpdate()
     {
-
         Rigidbody rb = GetComponent<Rigidbody>();
 
-        Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        Vector3 acceleration; 
-
-        if(flatVelocity.magnitude >= playerController.maxSpeed)
+        if(!inTheatre)
         {
-            acceleration =
-                Vector3.down * playerController.gravity;
-        }
+            //Backstage Movement
 
-        else
-        {
-            acceleration =
-                Vector3.down * playerController.gravity +
-                playerController.MovementInput * playerController.moveForce;
-        }
+            Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            Vector3 acceleration; 
 
-
-        // Movement and gravity
-        rb.AddForce(acceleration, ForceMode.Acceleration);
-
-        //Debug.Log(flatVelocity.magnitude);
-
-        // Jump
-        if (playerController.JumpRequested)
-        {
-            if (grounded)
+            if(flatVelocity.magnitude >= playerController.maxSpeed)
             {
-                Vector3 jump = Vector3.up * playerController.jumpForce;
-
-                rb.AddForce(jump, ForceMode.VelocityChange);
+                acceleration =
+                    Vector3.down * playerController.gravity;
             }
 
-            playerController.JumpRequested = false;
+            else
+            {
+                acceleration =
+                    Vector3.down * playerController.gravity +
+                    playerController.MovementInput * playerController.moveForce;
+            }
+
+
+            // Movement and gravity
+            rb.AddForce(acceleration, ForceMode.Acceleration);
+
+            //Debug.Log(flatVelocity.magnitude);
+
+            // Jump
+            if (playerController.JumpRequested)
+            {
+                if (grounded)
+                {
+                    Vector3 jump = Vector3.up * playerController.jumpForce;
+
+                    rb.AddForce(jump, ForceMode.VelocityChange);
+                }
+
+                playerController.JumpRequested = false;
+            }
+        }
+        else
+        {
+            //Theatre movement
+            Vector3 inputRotation = new Vector3(-90f, 180f, 0f);
+            Vector3 spaceMovement = Quaternion.Euler(inputRotation) * playerController.MovementInput;
+
+            Vector3 planarVelocity = new Vector3(rb.linearVelocity.x,  rb.linearVelocity.y, 0f);
+            Vector3 acceleration = new Vector3(0f,0f,0f); 
+
+            if(planarVelocity.magnitude <= playerController.theatreMaxSpeed)
+            {
+                acceleration = spaceMovement * playerController.theatreMoveForce;
+            }
+
+            // Try to slow movement
+            Vector3 restitutionForce = planarVelocity *  playerController.theatreRestitutionForce;
+            acceleration -= restitutionForce;
+
+            rb.AddForce(acceleration, ForceMode.Acceleration);
+
+            //Theatre Rotation
+
+            float yaw = 0f;
+            float pitch = 0f;
+
+            float rotationSensitivity = 5f;
+
+            if (Input.GetMouseButton(1))
+            {
+                yaw += Input.GetAxis("Mouse X") * rotationSensitivity;
+                pitch -= Input.GetAxis("Mouse Y") * rotationSensitivity;
+            }
+
+            // Parent
+            transform.Rotate(new Vector3(pitch, -yaw, 0f), Space.World);
         }
         
         if(playerController.CloneRequested)
@@ -159,6 +201,10 @@ public class ShapeShiftedPlayer : MonoBehaviour
         if (other.CompareTag("CameraSwap"))
         {
             playerController.isCameraSwappable = true;
+            if(other.name == "CameraSwapTriggerRoom")
+            {
+                setTheatreMode(true);
+            }
         }
     }
 
@@ -167,6 +213,10 @@ public class ShapeShiftedPlayer : MonoBehaviour
         if (other.CompareTag("CameraSwap"))
         {
             playerController.isCameraSwappable = false;
+            if(other.name == "CameraSwapTriggerRoom")
+            {
+                setTheatreMode(false);
+            }
         }
     }
     void OnCollisionExit(Collision collision)
@@ -206,6 +256,13 @@ public class ShapeShiftedPlayer : MonoBehaviour
         {
             selectedObject = null;
         }
+    }
+
+    private void setTheatreMode(bool onOff)
+    {
+        inTheatre = onOff;
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = onOff;
     }
 
     void returnToBlob()

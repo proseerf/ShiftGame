@@ -17,11 +17,15 @@ public class PlayerController : MonoBehaviour
     public Vector3 buttonLocation = new Vector3(0,0,0);
 
     public bool isCameraSwappable = false;
-     [Header("Movement")]
+     [Header("Backstage Movement")]
     public float gravity = 9.81f;
      public float moveForce = 12f;
      public float jumpForce = 5f;
      public float maxSpeed = 5f;
+     [Header("Theatre View Movement")]
+     public float theatreMaxSpeed = 5f;
+     public float theatreMoveForce = 12f;
+     public float theatreRestitutionForce = 5f;
 
     //hate this circular reference
     public GameObject blobObject;
