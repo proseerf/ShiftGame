@@ -358,6 +358,9 @@ public class PlayerController : MonoBehaviour
 
         newObject.transform.SetParent(currentObject.transform.parent);
 
+
+        newObject.layer = 6;
+
         // Destroy original if requested
         if (destroyMode)
             Destroy(currentObject);
