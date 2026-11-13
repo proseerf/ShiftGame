@@ -120,8 +120,7 @@ public class SoftBodyBlob : MonoBehaviour
             if(copyable)
             {
                 //HideBlob();
-                playerController.ShapeShift(gameObject, selectedObject, false);
-                Debug.Log("touching copyable object");
+                Copy(selectedObject);
             }
             playerController.CopyRequested = false;
         }
@@ -157,6 +156,11 @@ public class SoftBodyBlob : MonoBehaviour
 
         RecenterBlob();
         UpdateMesh();
+    }
+
+    public void Copy(GameObject objectToCopy)
+    {
+        playerController.ShapeShift(gameObject, selectedObject, false);
     }
 
     public void SetVelocity(Vector3 velocity)

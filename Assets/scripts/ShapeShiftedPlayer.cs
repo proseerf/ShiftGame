@@ -89,13 +89,14 @@ public class ShapeShiftedPlayer : MonoBehaviour
         // Copy
         if (playerController.CopyRequested)
         {
+            playerController.CopyRequested = false;
             if(copyable)
             {
                 reform(rb);
+                playerController.blobObject.GetComponent<SoftBodyBlob>().Copy(selectedObject);
                 //playerController.CopyRequested = false;
                 //playerController.ShapeShift(gameObject,selectedObject);
             }
-            playerController.CopyRequested = false;
         }
 
         // Reform
@@ -103,24 +104,23 @@ public class ShapeShiftedPlayer : MonoBehaviour
         {
             reform(rb);
         }
+        
     }
 
     void reform(Rigidbody rb)
     {
             // Save the current Rigidbody velocity BEFORE destroying the object
-            Vector3 currentVelocity = rb.linearVelocity;
+            //Vector3 currentVelocity = rb.linearVelocity;
 
             // Position the blob where the shapeshifted object is
             playerController.blobObject.transform.position = transform.position;
-            //playerController.blobObject.transform.rotation = transform.rotation;
-            playerController.blobObject.transform.localScale = transform.localScale;
 
             // Transfer velocity to the blob
             SoftBodyBlob blob =
                 playerController.blobObject.GetComponent<SoftBodyBlob>();
 
-            Debug.Log("setting velocity: " + rb.linearVelocity);
-            blob.SetVelocity(rb.linearVelocity);
+            // Debug.Log("setting velocity: " + rb.linearVelocity);
+            // blob.SetVelocity(rb.linearVelocity);
 
             // Switch camera target
             Camera.main.GetComponent<CameraFollow>().target =
