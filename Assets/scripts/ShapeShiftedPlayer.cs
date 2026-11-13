@@ -1,8 +1,16 @@
+using System.Reflection.Metadata;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ShapeShiftedPlayer : MonoBehaviour
 {
     public bool grounded;
+    public bool copyable;
+
+    private HashSet<Collider> groundContacts = new HashSet<Collider>();
+    private HashSet<Collider> copyableContacts = new HashSet<Collider>();
+
+    public GameObject selectedObject;
 
     [Header("controller")]
     [SerializeField] public PlayerController playerController;
@@ -20,16 +28,30 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
     void FixedUpdate()
     {
-        float dt = Time.fixedDeltaTime;
 
         Rigidbody rb = GetComponent<Rigidbody>();
 
-        Vector3 acceleration =
-            Vector3.down * playerController.gravity +
-            playerController.MovementInput * playerController.moveForce;
+        Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 acceleration; 
+
+        if(flatVelocity.magnitude >= playerController.maxSpeed)
+        {
+            acceleration =
+                Vector3.down * playerController.gravity;
+        }
+
+        else
+        {
+            acceleration =
+                Vector3.down * playerController.gravity +
+                playerController.MovementInput * playerController.moveForce;
+        }
+
 
         // Movement and gravity
         rb.AddForce(acceleration, ForceMode.Acceleration);
+
+        //Debug.Log(flatVelocity.magnitude);
 
         // Jump
         if (playerController.JumpRequested)
@@ -40,8 +62,8 @@ public class ShapeShiftedPlayer : MonoBehaviour
 
                 rb.AddForce(jump, ForceMode.VelocityChange);
             }
-            
-            playerController.ConsumeJumpRequest();
+
+            playerController.JumpRequested = false;
         }
         
         if(playerController.CloneRequested)
@@ -63,13 +85,72 @@ public class ShapeShiftedPlayer : MonoBehaviour
             playerController.TeleportRequested = 0;
             playerController.ChangeViews();
         }
+
+        // Copy
+        if (playerController.CopyRequested)
+        {
+            if(copyable)
+            {
+                reform(rb);
+                //playerController.CopyRequested = false;
+                //playerController.ShapeShift(gameObject,selectedObject);
+            }
+            playerController.CopyRequested = false;
+        }
+
+        // Reform
+        if (playerController.ReformRequested)
+        {
+            reform(rb);
+        }
+    }
+
+    void reform(Rigidbody rb)
+    {
+            // Save the current Rigidbody velocity BEFORE destroying the object
+            Vector3 currentVelocity = rb.linearVelocity;
+
+            // Position the blob where the shapeshifted object is
+            playerController.blobObject.transform.position = transform.position;
+            //playerController.blobObject.transform.rotation = transform.rotation;
+            playerController.blobObject.transform.localScale = transform.localScale;
+
+            // Transfer velocity to the blob
+            SoftBodyBlob blob =
+                playerController.blobObject.GetComponent<SoftBodyBlob>();
+
+            Debug.Log("setting velocity: " + rb.linearVelocity);
+            blob.SetVelocity(rb.linearVelocity);
+
+            // Switch camera target
+            Camera.main.GetComponent<CameraFollow>().target =
+                playerController.blobObject.transform;
+
+            // Destroy shapeshifted object
+            Destroy(gameObject);
+
+            blob.selectedObject = selectedObject;
+
+            // Show blob
+            blob.ShowBlob();
+
+            playerController.ReformRequested = false;
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        grounded = false;
-        if (collision.collider.CompareTag("Ground")){
+        Collider other = collision.collider;
+
+        if (other.CompareTag("Ground"))
+        {
+            groundContacts.Add(other);
             grounded = true;
+        }
+
+        if (other.CompareTag("copyable"))
+        {
+            copyableContacts.Add(other);
+            UpdateSelectedObject();
         }
     }
 
@@ -88,6 +169,45 @@ public class ShapeShiftedPlayer : MonoBehaviour
             playerController.isCameraSwappable = false;
         }
     }
+    void OnCollisionExit(Collision collision)
+    {
+        Collider other = collision.collider;
+
+        if (other.CompareTag("Ground"))
+        {
+            groundContacts.Remove(other);
+            grounded = groundContacts.Count > 0;
+        }
+
+        if (other.CompareTag("copyable"))
+        {
+            copyableContacts.Remove(other);
+            UpdateSelectedObject();
+        }
+    }
+
+    void UpdateSelectedObject()
+    {
+        copyableContacts.RemoveWhere(c => c == null);
+
+        copyable = copyableContacts.Count > 0;
+
+        if (copyable)
+        {
+            selectedObject = null;
+
+            foreach (Collider col in copyableContacts)
+            {
+                selectedObject = col.gameObject;
+                break;
+            }
+        }
+        else
+        {
+            selectedObject = null;
+        }
+    }
+
     void returnToBlob()
     {
         

@@ -2,8 +2,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System.Linq;
+using UnityEngine.InputSystem.XR;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer),typeof(EyeTracking))]
 public class SoftBodyBlob : MonoBehaviour
 {
     [Header("Blob Shape")]
@@ -33,7 +35,7 @@ public class SoftBodyBlob : MonoBehaviour
         public float restLength;
     }
 
-    Vector3[] positions;
+    public Vector3[] positions;
     Vector3[] previous;
     Vector3[] original;
     Vector3[] normals;
@@ -47,8 +49,6 @@ public class SoftBodyBlob : MonoBehaviour
     public bool copyable;
 
     public GameObject selectedObject;
-
-    private bool blobHidden = false;
 
     void Start()
     {
@@ -75,13 +75,28 @@ public class SoftBodyBlob : MonoBehaviour
         for (int i = 0; i < positions.Length; i++)
         {
             Vector3 velocity =
-                (positions[i] - previous[i]) * damping;
+            (positions[i] - previous[i]) * damping;
 
             previous[i] = positions[i];
 
-            Vector3 acceleration =
-                Vector3.down * playerController.gravity +
-                playerController.MovementInput * playerController.moveForce;
+            Vector3 acceleration;
+
+            //since velocity is calculated differently on the soft body then the Rigidbody(verlet vs linear)
+            //the soft bodys velocity can be 0.2 while moving just as fast as the Rigidbody at something more like 5
+            //not a huge issue as the softbody doesn't have to worry about weird bouncing but something to note
+            if(velocity.magnitude <= playerController.maxSpeed)
+            {
+                acceleration =
+                    Vector3.down * playerController.gravity +
+                    playerController.MovementInput * playerController.moveForce;
+            }
+            else
+            {
+                acceleration =
+                    Vector3.down * playerController.gravity;
+            }
+
+            //Debug.Log("Velocity: " + velocity + " acceleration " + acceleration);
 
             positions[i] += velocity + acceleration * dt * dt;
         }
@@ -96,7 +111,7 @@ public class SoftBodyBlob : MonoBehaviour
                     previous[i] -= Vector3.up * playerController.jumpForce * dt;
                 }   
             }
-            playerController.ConsumeJumpRequest();
+            playerController.JumpRequested = false;
         }
 
         // Copy
@@ -104,12 +119,17 @@ public class SoftBodyBlob : MonoBehaviour
         {
             if(copyable)
             {
-                // Hide the original
-                HideBlob();
-                playerController.ShapeShift(gameObject, selectedObject);
+                //HideBlob();
+                playerController.ShapeShift(gameObject, selectedObject, false);
                 Debug.Log("touching copyable object");
             }
-            playerController.ConsumeCopyRequest();
+            playerController.CopyRequested = false;
+        }
+
+        // Reform, don't do anything if blob mode
+        if (playerController.ReformRequested)
+        {
+            playerController.ReformRequested = false;
         }
         
         if(playerController.CloneRequested)
@@ -137,6 +157,61 @@ public class SoftBodyBlob : MonoBehaviour
 
         RecenterBlob();
         UpdateMesh();
+    }
+
+    public void SetVelocity(Vector3 velocity)
+    {
+        Vector3 localVelocity = transform.InverseTransformVector(velocity);
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            previous[i] = positions[i] -
+                (localVelocity / damping) * Time.fixedDeltaTime;
+        }
+    }
+
+    
+    public void HideBlob()
+    {
+        //blobHidden = true;
+
+        // Hide the rendered mesh
+        GetComponent<MeshRenderer>().enabled = false;
+
+        // Stop the physics simulation
+        enabled = false;
+
+        // Disable any colliders attached to the blob
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+
+        GetComponent<EyeTracking>().enabled = false;
+        // eyes.leftEye.GetComponent<MeshRenderer>().enabled = false;
+        // eyes.rightEye.GetComponent<MeshRenderer>().enabled = false;
+
+
+        // Disable the collision probe
+        if (collisionProbe != null)
+            collisionProbe.enabled = false;
+    }
+
+    public void ShowBlob()
+    {
+        GetComponent<MeshRenderer>().enabled = true;
+
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = true;
+        }
+
+        GetComponent<EyeTracking>().enabled = true;
+
+        if (collisionProbe != null)
+            collisionProbe.enabled = true;
+
+        enabled = true;
     }
 
     void CreateBlob()
@@ -244,44 +319,6 @@ public class SoftBodyBlob : MonoBehaviour
 
         Debug.Log("Blob created with " +
             positions.Length + " particles.");
-    }
-
-    public void HideBlob()
-    {
-        blobHidden = true;
-
-        // Hide the rendered mesh
-        GetComponent<MeshRenderer>().enabled = false;
-
-        // Stop the physics simulation
-        enabled = false;
-
-        // Disable any colliders attached to the blob
-        foreach (Collider col in GetComponentsInChildren<Collider>())
-        {
-            col.enabled = false;
-        }
-
-        // Disable the collision probe
-        if (collisionProbe != null)
-            collisionProbe.enabled = false;
-    }
-
-    public void ShowBlob()
-    {
-        blobHidden = false;
-
-        GetComponent<MeshRenderer>().enabled = true;
-
-        foreach (Collider col in GetComponentsInChildren<Collider>())
-        {
-            col.enabled = true;
-        }
-
-        if (collisionProbe != null)
-            collisionProbe.enabled = true;
-
-        enabled = true;
     }
 
     void AddEdge(int a, int b, HashSet<string> edgeSet)
@@ -402,6 +439,7 @@ public class SoftBodyBlob : MonoBehaviour
     void SolveCopyableCollision()
     {
         copyable = false;
+        selectedObject = null;
 
         for (int i = 0; i < positions.Length; i++)
         {
@@ -420,11 +458,11 @@ public class SoftBodyBlob : MonoBehaviour
 
                 copyable = true;
                 selectedObject = other.gameObject;
-                // float highlightFactor = 0.2f;
-                // Renderer r = other.GetComponent(typeof(Renderer)) as Renderer;
-		        // Color oldColor = r.material.GetColor("_Color");
-		        // Color newColor = new Color(oldColor.r + highlightFactor, oldColor.g +highlightFactor, oldColor.b + highlightFactor, oldColor.a);
-		        // r.material.SetColor("_Color", newColor);
+
+                // Material currentMat = gameObject.GetComponent<MeshRenderer>().materials[1];
+                // selectedObject.GetComponent<MeshRenderer>().materials = 
+                //     selectedObject.GetComponent<MeshRenderer>().materials.Append(currentMat).ToArray();
+
                 break;
             }
         }
@@ -532,6 +570,7 @@ public class SoftBodyBlob : MonoBehaviour
             positions[i] = transform.InverseTransformPoint(worldPosition);
         }
     }
+
     void OnDestroy()
     {
         if (collisionProbeObject != null)
