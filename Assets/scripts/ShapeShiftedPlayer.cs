@@ -71,7 +71,9 @@ public class ShapeShiftedPlayer : MonoBehaviour
         {
             if(copyable)
             {
-                playerController.ShapeShift(gameObject,selectedObject);
+                reform(rb);
+                //playerController.CopyRequested = false;
+                //playerController.ShapeShift(gameObject,selectedObject);
             }
             playerController.CopyRequested = false;
         }
@@ -79,6 +81,12 @@ public class ShapeShiftedPlayer : MonoBehaviour
         // Reform
         if (playerController.ReformRequested)
         {
+            reform(rb);
+        }
+    }
+
+    void reform(Rigidbody rb)
+    {
             // Save the current Rigidbody velocity BEFORE destroying the object
             Vector3 currentVelocity = rb.linearVelocity;
 
@@ -101,11 +109,12 @@ public class ShapeShiftedPlayer : MonoBehaviour
             // Destroy shapeshifted object
             Destroy(gameObject);
 
+            blob.selectedObject = selectedObject;
+
             // Show blob
             blob.ShowBlob();
 
             playerController.ReformRequested = false;
-        }
     }
 
     void OnCollisionEnter(Collision collision)

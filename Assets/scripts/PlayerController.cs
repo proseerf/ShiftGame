@@ -320,10 +320,27 @@ public class PlayerController : MonoBehaviour
         Camera.main.GetComponent<CameraFollow>().target =
             newObject.transform;
 
+        //update eyes
+        EyeTracking eyes = currentObject.GetComponent<EyeTracking>();
+        eyes.enabled = false;
 
-        // EyeTracking eyes = currentObject.GetComponent<EyeTracking>();
-        // EyeTracking neweyes = newObject.AddComponent<EyeTracking>();
-        // neweyes = eyes;
+        EyeTracking newEyes = newObject.AddComponent<EyeTracking>();
+        newEyes.enabled = false;
+
+        newEyes.rightEye = eyes.rightEye;
+        newEyes.leftEye = eyes.leftEye;
+
+        newEyes.eyeAnchor = newObject.transform;
+
+        newEyes.bodyCollider = newObject.GetComponent<Collider>();
+
+        newEyes.eyeSpacing = eyes.eyeSpacing;
+        newEyes.movementSpeed = eyes.movementSpeed;
+
+        newEyes.enabled = true;
+
+        newObject.transform.SetParent(currentObject.transform.parent);
+
         // Destroy original if requested
         if (destroyMode)
             Destroy(currentObject);

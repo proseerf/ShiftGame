@@ -176,9 +176,9 @@ public class SoftBodyBlob : MonoBehaviour
             col.enabled = false;
         }
 
-        EyeTracking eyes = GetComponent<EyeTracking>();
-        eyes.leftEye.GetComponent<MeshRenderer>().enabled = false;
-        eyes.rightEye.GetComponent<MeshRenderer>().enabled = false;
+        GetComponent<EyeTracking>().enabled = false;
+        // eyes.leftEye.GetComponent<MeshRenderer>().enabled = false;
+        // eyes.rightEye.GetComponent<MeshRenderer>().enabled = false;
 
 
         // Disable the collision probe
@@ -195,9 +195,7 @@ public class SoftBodyBlob : MonoBehaviour
             col.enabled = true;
         }
 
-        EyeTracking eyes = GetComponent<EyeTracking>();
-        eyes.leftEye.GetComponent<MeshRenderer>().enabled = true;
-        eyes.rightEye.GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<EyeTracking>().enabled = true;
 
         if (collisionProbe != null)
             collisionProbe.enabled = true;
