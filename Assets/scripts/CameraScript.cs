@@ -50,18 +50,6 @@ public class CameraFollow : MonoBehaviour
         if (cam != null && !cam.enabled)
             return;
 
-        // mouse release + capture
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-        if (Input.GetMouseButtonDown(0) && Cursor.lockState != CursorLockMode.Locked)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
         // Edit cam via mouse if mouse is being captured
         if (!PauseMenu.IsPaused)
         {
