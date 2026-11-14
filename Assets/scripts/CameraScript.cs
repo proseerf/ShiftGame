@@ -6,8 +6,6 @@ public class CameraFollow : MonoBehaviour
     public Vector3 offset = new Vector3(0, 2, -5);
     public float targetHeight = 1f;
 
-    public float mouseSensitivityX = 2f;
-    public float mouseSensitivityY = 1f;
     public float minPitch = -20f;
     public float maxPitch = 70f;
 
@@ -53,8 +51,8 @@ public class CameraFollow : MonoBehaviour
         // Edit cam via mouse if mouse is being captured
         if (!PauseMenu.IsPaused)
         {
-            yaw += Input.GetAxis("Mouse X") * mouseSensitivityX;
-            pitch -= Input.GetAxis("Mouse Y") * mouseSensitivityY;
+            yaw += Input.GetAxis("Mouse X") * GameSettings.GetSensitivityX();
+            pitch -= Input.GetAxis("Mouse Y") * GameSettings.GetSensitivityY();
             pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         }
 
