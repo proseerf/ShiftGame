@@ -9,6 +9,8 @@ public class PauseMenu : MonoBehaviour
 
     public static bool IsPaused { get; private set; }
 
+    public SettingsMenu settingsMenu;
+
     void Start()
     {
         pausePanel.SetActive(false);
@@ -48,7 +50,7 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenSettings()
     {
-        //TODO
+        settingsMenu.Open(pausePanel);
     }
 
     public void ExitToMainMenu()
