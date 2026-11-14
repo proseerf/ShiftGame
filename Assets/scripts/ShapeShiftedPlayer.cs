@@ -2,6 +2,7 @@ using System.Reflection.Metadata;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 
 public class ShapeShiftedPlayer : MonoBehaviour
 {
@@ -104,8 +105,11 @@ public class ShapeShiftedPlayer : MonoBehaviour
                 pitch -= Input.GetAxis("Mouse Y") * rotationSensitivity;
             }
 
-            // Parent
             transform.Rotate(new Vector3(pitch, -yaw, 0f), Space.World);
+
+            //Theatre Resized
+            float scroll = Input.mouseScrollDelta.y * 0.1f ;
+            transform.localScale += new Vector3(scroll, scroll, scroll) * 0.2f; 
         }
         
         if(playerController.CloneRequested)

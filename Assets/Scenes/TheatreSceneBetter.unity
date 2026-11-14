@@ -179,7 +179,8 @@ MonoBehaviour:
   goalRenderTexture: {fileID: 8400000, guid: 4d08633690fc08c459878f3fd0e21fc8, type: 2}
   overspillPenalty: 2
   matchPercentage: 50
-  winPercent: 85
+  scoreAdjustemnt: 1.1
+  winPercent: 95
   winPercentText: {fileID: 1720546026}
   penaltyPercentText: {fileID: 1341685594}
 --- !u!4 &105611311

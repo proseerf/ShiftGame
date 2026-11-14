@@ -3,6 +3,7 @@ using System.IO;
 using TMPro;
 using System;
 using Unity.Collections.Tests.CoreCLR.TestJobs;
+using System.Text.RegularExpressions;
 
 public class SubmissionLogicScript : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class SubmissionLogicScript : MonoBehaviour
     
     [Range(0f, 10f)] public float overspillPenalty = 2f;
     public float matchPercentage;
+    [Range(0.5f, 1.5f)]public float scoreAdjustemnt = 1.1f;
 
     [Range(0, 100)] public int winPercent = 90;
 
@@ -80,13 +82,16 @@ public class SubmissionLogicScript : MonoBehaviour
         // 4. Calculate final score using the formula
         if (totalGoalPixels > 0)
         {
-            float score = (float)matchingPixels / totalGoalPixels;
-            float penaltyScore = (overspillPixels * overspillPenalty) / totalGoalPixels;
-            Debug.Log("score: " + score);
-            Debug.Log("pen: " + penaltyScore);
+            float penaltyScore = Mathf.Clamp01((overspillPixels * overspillPenalty) / totalGoalPixels);
+            penPercent = Convert.ToInt32(Math.Floor(penaltyScore * 100));
+            
+            float score = (float) (matchingPixels * scoreAdjustemnt)/ totalGoalPixels;
+            score = Mathf.Clamp01(score);
+
             score -= penaltyScore;
-            penPercent = Convert.ToInt32(Math.Ceiling(Mathf.Clamp01(penaltyScore) * 100));
-            matchPercentage = Mathf.Clamp01(score) * 100;
+            score = Mathf.Clamp01(score);
+
+            matchPercentage = score * 100;
         }
 
         setWinPercentText(Convert.ToInt32(Math.Ceiling(matchPercentage)));
