@@ -1,5 +1,7 @@
 
+using System.Reflection.Metadata;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,34 +12,39 @@ public class PlayerController : MonoBehaviour
     public Camera camera2 { get; private set; }
 
     [field: SerializeField]
-    Vector3 theatreLocation = new Vector3(0,0,0);
+    public Vector3 theatreLocation = new Vector3(0,0,0);
 
-    Vector3 buttonLocation = new Vector3(0,0,0);
+    public Vector3 buttonLocation = new Vector3(0,0,0);
 
-    bool isCameraSwappable = false;
-     [Header("Movement")]
+    public bool isCameraSwappable = false;
+     [Header("Backstage Movement")]
     public float gravity = 9.81f;
      public float moveForce = 12f;
      public float jumpForce = 5f;
+     public float maxSpeed = 5f;
+     [Header("Theatre View Movement")]
+     public float theatreMaxSpeed = 5f;
+     public float theatreMoveForce = 12f;
+     public float theatreRestitutionForce = 5f;
+
+    //hate this circular reference
+    public GameObject blobObject;
 
     // Movement input supplied to SoftBodyBlob
     public Vector3 MovementInput;
 
-    public bool JumpRequested { get; private set; }
+    public bool JumpRequested { get;  set; }
 
-    public bool CopyRequested { get; private set; }
+    public bool CopyRequested { get;  set; }
 
-    // Called by SoftBodyBlob after a jump has been processed
-    public void ConsumeJumpRequest()
-    {
-        JumpRequested = false;
-    }
+    // 0 - No teleport requested
+    // 1 - Go to Theatre Location
+    // 2 - Go to Button Location
+    public int TeleportRequested {get; set; }
+    private bool inSubmissionRoom = false;
 
-    // Called by SoftBodyBlob after a jump has been processed
-    public void ConsumeCopyRequest()
-    {
-        CopyRequested = false;
-    }
+    public bool CloneRequested {get; set; }
+    public bool ReformRequested { get;  set; }
 
     void Start()
     {
@@ -63,17 +70,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void CreateStaticCopy()
+    void RequestClone()
+    {
+        CloneRequested = true;
+    }
+
+    public void CreateStaticCopy(GameObject argGameObject, Transform argTransform)
     {
         // Create a copy of the current GameObject
         GameObject copy = Instantiate(
-            gameObject,
-            transform.position,
-            transform.rotation
+            argGameObject,
+            argTransform.position,
+            argTransform.rotation
         );
 
         // Keep the same scale
-        copy.transform.localScale = transform.lossyScale;
+        copy.transform.localScale = argTransform.lossyScale;
 
         // Remove everything except the mesh and renderer
         Component[] components = copy.GetComponents<Component>();
@@ -92,6 +104,8 @@ public class PlayerController : MonoBehaviour
 
         // Mark as static
         copy.isStatic = true;
+
+        CloneRequested = false;
     }
 
     void Update()
@@ -103,16 +117,14 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.X) && camera2.enabled == true)
+        if(Input.GetKeyDown(KeyCode.X) && inSubmissionRoom)
         {
-            CreateStaticCopy();
-            SwapCamera();
+            RequestClone();
             returnToButton();
         }
         if(Input.GetKeyDown(KeyCode.Tab) && isCameraSwappable)
         {
-            SwapCamera();
-            if(camera2.enabled == true)
+            if(camera1.enabled == true)
             {
                 goToTheatreDisplay();
             }
@@ -169,6 +181,17 @@ public class PlayerController : MonoBehaviour
         {
             CopyRequested = true;
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log("r pressed");
+            ReformRequested = true;
+        }
+    }
+    public void ChangeViews()
+    {
+        SwapCamera();
+        inSubmissionRoom = !inSubmissionRoom;
     }
 
     void SwapCamera()
@@ -179,65 +202,181 @@ public class PlayerController : MonoBehaviour
 
     void goToTheatreDisplay()
     {
-        buttonLocation = transform.position;
-        transform.position = theatreLocation;
+        TeleportRequested = 1;
     }
 
     void returnToButton()
     {
-        transform.position = buttonLocation;
+        TeleportRequested = 2;
     }
 
-        public void ShapeShift(GameObject currentObject, GameObject targetObject)
+    public void ShapeShift(
+        GameObject currentObject,
+        GameObject targetObject,
+        bool destroyMode = true)
     {
-        if (targetObject == null)
+        if (targetObject == null || currentObject == null)
             return;
 
-        // Get the original mesh components
-        MeshFilter copiedMeshFilter = targetObject.GetComponent<MeshFilter>();
-        Collider copiedCollider = targetObject.GetComponent<Collider>();
+        MeshFilter copiedMeshFilter =
+            targetObject.GetComponent<MeshFilter>();
 
-        if (copiedMeshFilter == null)
+        Collider copiedCollider =
+            targetObject.GetComponent<Collider>();
+
+        SoftBodyBlob blob =
+            blobObject.GetComponent<SoftBodyBlob>();
+
+        if (copiedMeshFilter == null || blob == null)
             return;
 
-        // Create a new object
-        GameObject newObject = new GameObject(targetObject.name + "_Copy");
+        // Create temporary morph controller
+        GameObject morphObject = new GameObject("MorphObject");
 
-        // Copy transform
-        newObject.transform.position = currentObject.transform.position;
-        newObject.transform.rotation = targetObject.transform.rotation;
-        newObject.transform.localScale = targetObject.transform.localScale;
+        MorphObject morph =
+            morphObject.AddComponent<MorphObject>();
 
-        // Add mesh components
-        MeshFilter newMeshFilter = newObject.AddComponent<MeshFilter>();
-        MeshRenderer newMeshRenderer = newObject.AddComponent<MeshRenderer>();
+        // Calculate the morph
+        morph.Begin(
+            blobObject.transform,
+            blob.positions,
+            copiedMeshFilter.mesh,
+            targetObject.transform
+        );
 
-        // Assign the same mesh and materials
-        newMeshFilter.sharedMesh = copiedMeshFilter.sharedMesh;
-        newMeshRenderer.sharedMaterials = currentObject.GetComponent<MeshRenderer>().sharedMaterials;
+        // Animate the morph, then create the final object
+        StartCoroutine(FinishShapeShift(
+            currentObject,
+            targetObject,
+            copiedCollider,
+            destroyMode,
+            morph,
+            blob
+        ));
+    }
 
-        ShapeShiftedPlayer newControls = newObject.AddComponent<ShapeShiftedPlayer>();
-        newControls.grounded=true;
-        newControls.playerController = this;
-
-        Rigidbody rigidbody = newObject.AddComponent<Rigidbody>();
-        rigidbody.useGravity = false;
-        rigidbody.isKinematic = false;
-
-
-        Debug.Log("copied collider type:" + copiedCollider.GetType());
-        // Add a collider of the same type
-        if (copiedCollider != null)
+    private System.Collections.IEnumerator FinishShapeShift(
+        GameObject currentObject,
+        GameObject targetObject,
+        Collider copiedCollider,
+        bool destroyMode,
+        MorphObject morph,
+        SoftBodyBlob blob)
+    {
+        // Animate the blob towards the target shape
+        while (!morph.IsComplete)
         {
-            Collider newCollider = newObject.AddComponent(copiedCollider.GetType()) as Collider;
+            Vector3[] morphedPositions =
+                morph.Advance(Time.deltaTime);
 
-            // Copy collider settings
-            newCollider.isTrigger = copiedCollider.isTrigger;
-            newCollider.sharedMaterial = copiedCollider.sharedMaterial;
-            patternMatchCollider(copiedCollider,newCollider);
+            // Apply the new positions to the blob
+            for (int i = 0; i < morphedPositions.Length; i++)
+            {
+                blob.positions[i] = morphedPositions[i];
+            }
+
+            yield return null;
         }
 
-        Camera.main.GetComponent<CameraFollow>().target = newObject.transform;
+        // Apply final positions
+        Vector3[] finalPositions = morph.CurrentPositions;
+
+        for (int i = 0; i < finalPositions.Length; i++)
+        {
+            blob.positions[i] = finalPositions[i];
+        }
+
+        // Clean up the temporary morph controller
+        Destroy(morph.gameObject);
+
+        if (currentObject == null || targetObject == null)
+            yield break;
+
+        // Create final object
+        GameObject newObject =
+            new GameObject(targetObject.name + "_Copy");
+
+        newObject.transform.position =
+            currentObject.transform.position;
+
+        newObject.transform.rotation =
+            targetObject.transform.rotation;
+
+        newObject.transform.localScale =
+            targetObject.transform.localScale;
+
+        // Add mesh components
+        MeshFilter newMeshFilter =
+            newObject.AddComponent<MeshFilter>();
+
+        MeshRenderer newMeshRenderer =
+            newObject.AddComponent<MeshRenderer>();
+
+        newMeshFilter.sharedMesh =
+            targetObject.GetComponent<MeshFilter>().sharedMesh;
+
+        newMeshRenderer.sharedMaterials =
+            currentObject.GetComponent<MeshRenderer>().sharedMaterials;
+
+        // Add controls
+        ShapeShiftedPlayer newControls =
+            newObject.AddComponent<ShapeShiftedPlayer>();
+
+        newControls.grounded = true;
+        newControls.playerController = this;
+
+        // Add Rigidbody
+        Rigidbody rb =
+            newObject.AddComponent<Rigidbody>();
+
+        rb.useGravity = false;
+        rb.isKinematic = false;
+
+        // Copy collider
+        if (copiedCollider != null)
+        {
+            Collider newCollider =
+                newObject.AddComponent(copiedCollider.GetType()) as Collider;
+
+            newCollider.isTrigger = copiedCollider.isTrigger;
+            newCollider.sharedMaterial = copiedCollider.sharedMaterial;
+
+            patternMatchCollider(copiedCollider, newCollider);
+        }
+
+        // Update camera
+        Camera.main.GetComponent<CameraFollow>().target =
+            newObject.transform;
+
+        //update eyes
+        EyeTracking eyes = currentObject.GetComponent<EyeTracking>();
+        eyes.enabled = false;
+
+        EyeTracking newEyes = newObject.AddComponent<EyeTracking>();
+        newEyes.enabled = false;
+
+        newEyes.rightEye = eyes.rightEye;
+        newEyes.leftEye = eyes.leftEye;
+
+        newEyes.eyeAnchor = newObject.transform;
+
+        newEyes.bodyCollider = newObject.GetComponent<Collider>();
+
+        newEyes.eyeSpacing = eyes.eyeSpacing;
+        newEyes.movementSpeed = eyes.movementSpeed;
+
+        newEyes.enabled = true;
+
+        newObject.transform.SetParent(currentObject.transform.parent);
+
+
+        newObject.layer = 6;
+
+        // Destroy original if requested
+        if (destroyMode)
+            Destroy(currentObject);
+        else
+            blob.HideBlob();
     }
 
     private void patternMatchCollider(Collider copiedCollider, Collider newCollider)

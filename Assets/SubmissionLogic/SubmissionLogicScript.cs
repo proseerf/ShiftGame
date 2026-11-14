@@ -1,16 +1,27 @@
 using UnityEngine;
 using System.IO;
+using TMPro;
+using System;
+using Unity.Collections.Tests.CoreCLR.TestJobs;
+using System.Text.RegularExpressions;
 
 public class SubmissionLogicScript : MonoBehaviour
 {
     public RenderTexture shadowRenderTexture; // The live shadow from your camera
     public RenderTexture goalRenderTexture;             // The target shape silhouette
     
-    [Range(0f, 1f)] public float overspillPenalty = 0.5f;
+    [Range(0f, 10f)] public float overspillPenalty = 2f;
     public float matchPercentage;
+    [Range(0.5f, 1.5f)]public float scoreAdjustemnt = 1.1f;
+
+    [Range(0, 100)] public int winPercent = 90;
 
     private Texture2D tempGoal; 
     private Texture2D tempShadow;
+
+    public TextMeshProUGUI winPercentText;
+    public TextMeshProUGUI penaltyPercentText;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,12 +33,6 @@ public class SubmissionLogicScript : MonoBehaviour
     void Update()
     {
         CalculateFill();
-
-        // Press Spacebar in Play Mode to export both renders to PNG
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            ExportRendersToPNG();
-        }
     }
 
 
@@ -61,22 +66,36 @@ public class SubmissionLogicScript : MonoBehaviour
             if (isGoal)
             {
                 totalGoalPixels++;
-                if (isShadow) matchingPixels++;
+                if (isShadow) 
+                {
+                    matchingPixels++;
+                }
             }
             else if (isShadow)
             {
                 overspillPixels++;
             }
         }
+        
+        int penPercent = 0;
 
         // 4. Calculate final score using the formula
         if (totalGoalPixels > 0)
         {
-            float score = (matchingPixels - (overspillPixels * overspillPenalty)) / totalGoalPixels;
-            matchPercentage = Mathf.Clamp01(score);
-            Debug.Log(matchPercentage);
+            float penaltyScore = Mathf.Clamp01((overspillPixels * overspillPenalty) / totalGoalPixels);
+            penPercent = Convert.ToInt32(Math.Floor(penaltyScore * 100));
+            
+            float score = (float) (matchingPixels * scoreAdjustemnt)/ totalGoalPixels;
+            score = Mathf.Clamp01(score);
+
+            score -= penaltyScore;
+            score = Mathf.Clamp01(score);
+
+            matchPercentage = score * 100;
         }
 
+        setWinPercentText(Convert.ToInt32(Math.Ceiling(matchPercentage)));
+        setPenaltyText(penPercent);
     }
 
     [ContextMenu("Export Renders to PNG")]
@@ -105,5 +124,70 @@ public class SubmissionLogicScript : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
 #endif
+    }
+
+    private string getUIPercentText(int percentage)
+    {
+        return "Shadow Coverage: " + percentage + "%";
+    }
+
+    private void setWinPercentText(int percentage)
+    {
+        if(percentage >= winPercent)
+        {
+            winPercentText.text = getUIPercentText(percentage);
+            winPercentText.color = Color.green;
+        }
+        else if (percentage >= (winPercent - 10))
+        {
+            winPercentText.text = getUIPercentText(percentage);
+            winPercentText.color = Color.greenYellow;
+        }
+        else if (percentage >= (winPercent - 20))
+        {
+            winPercentText.text = getUIPercentText(percentage);
+            winPercentText.color = Color.yellow;
+        }
+        else
+        {
+            winPercentText.text = getUIPercentText(percentage);
+            winPercentText.color = Color.orange;
+        }
+    }
+
+    private string getUIPenPercentText(int percentage)
+    {
+        return "Overfill Penalty: " + percentage + "%";
+    }
+
+    private void setPenaltyText(int percentage)
+    {
+        if(percentage == 0)
+        {
+            penaltyPercentText.text = "";
+        }
+        else if (percentage < 5)
+        {
+            penaltyPercentText.text = getUIPenPercentText(percentage);
+            penaltyPercentText.color = Color.orange;
+        }
+        else if (percentage < 10)
+        {
+            penaltyPercentText.text = getUIPenPercentText(percentage);
+            penaltyPercentText.color = Color.orangeRed;
+        }
+        else
+        {
+            penaltyPercentText.text = getUIPenPercentText(percentage);
+            penaltyPercentText.color = Color.red;
+        }
+    }
+
+    private void WinLevel(int percentage)
+    {
+        // Pause Game logic
+
+        // Show UI Screen
+
     }
 }
