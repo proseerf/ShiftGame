@@ -338,6 +338,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseMenuCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 7383537192220027680, guid: b285f6f6335b99d4887df02c7ca18b2a, type: 3}
+      propertyPath: settingsMenu
+      value: 
+      objectReference: {fileID: 1836238044}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1276,6 +1280,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1836238044 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8826144428937900368, guid: 3916e9479c08b724d8688946238e30cf, type: 3}
+  m_PrefabInstance: {fileID: 2021919103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7544265c65aadde42a786643905c92a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SettingsMenu
 --- !u!1 &1910072492
 GameObject:
   m_ObjectHideFlags: 0
