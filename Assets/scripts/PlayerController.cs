@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
      public float moveForce = 12f;
      public float jumpForce = 5f;
      public float maxSpeed = 5f;
+     public float cooldownAmount = 2f;
+
      [Header("Theatre View Movement")]
      public float theatreMaxSpeed = 5f;
      public float theatreMoveForce = 12f;
@@ -45,6 +47,8 @@ public class PlayerController : MonoBehaviour
 
     public bool CloneRequested {get; set; }
     public bool ReformRequested { get;  set; }
+
+    private float cooldown = 0f;
 
     void Start()
     {
@@ -110,6 +114,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (cooldown > 0)
+        {
+            cooldown -= Time.deltaTime;
+        }
         // no update if paused
         if (PauseMenu.IsPaused)
         {
@@ -179,7 +187,12 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            CopyRequested = true;
+            Debug.Log(cooldown);
+            if (cooldown <= 0f)
+            {
+                cooldown = cooldownAmount;
+                CopyRequested = true;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.R))

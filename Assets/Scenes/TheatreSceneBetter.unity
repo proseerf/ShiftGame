@@ -4243,6 +4243,10 @@ PrefabInstance:
       value: Character
       objectReference: {fileID: 0}
     - target: {fileID: 3019598689943686167, guid: 069dc18010abb8e48942966a794e9525, type: 3}
+      propertyPath: cooldownAmount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3019598689943686167, guid: 069dc18010abb8e48942966a794e9525, type: 3}
       propertyPath: theatreLocation.x
       value: 1
       objectReference: {fileID: 0}

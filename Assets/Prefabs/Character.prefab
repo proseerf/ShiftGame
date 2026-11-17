@@ -51,10 +51,16 @@ MonoBehaviour:
   <camera1>k__BackingField: {fileID: 4788926796363219048}
   <camera2>k__BackingField: {fileID: 0}
   theatreLocation: {x: 0, y: 0, z: 0}
+  buttonLocation: {x: 0, y: 0, z: 0}
+  isCameraSwappable: 0
   gravity: 9.81
   moveForce: 12
   jumpForce: 5
   maxSpeed: 5
+  cooldownAmount: 2
+  theatreMaxSpeed: 5
+  theatreMoveForce: 12
+  theatreRestitutionForce: 5
   blobObject: {fileID: 8004481792018124800}
   MovementInput: {x: 0, y: 0, z: 0}
 --- !u!1 &2060078155703900875
@@ -300,7 +306,6 @@ MonoBehaviour:
   target: {fileID: 6271986910983362719}
   offset: {x: 0, y: 2, z: -5}
   targetHeight: 1
-  mouseSensitivity: 3
   minPitch: -20
   maxPitch: 70
   minDistance: 2
