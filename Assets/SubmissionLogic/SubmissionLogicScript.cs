@@ -22,6 +22,9 @@ public class SubmissionLogicScript : MonoBehaviour
     public TextMeshProUGUI winPercentText;
     public TextMeshProUGUI penaltyPercentText;
 
+    public Camera viewCamera;
+    public GameObject scoreUI;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,7 +35,28 @@ public class SubmissionLogicScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CalculateFill();
+        // only calculate while looking through the theatre camera
+        bool inTheatreView = false;
+
+        if (viewCamera.enabled)
+        {
+            inTheatreView = true;
+        }
+
+        if (scoreUI != null)
+        {
+            bool isShowing = scoreUI.activeSelf;
+
+            if (isShowing != inTheatreView)
+            {
+                scoreUI.SetActive(inTheatreView);
+            }
+        }
+
+        if (inTheatreView)
+        {
+            CalculateFill();
+        }
     }
 
 
