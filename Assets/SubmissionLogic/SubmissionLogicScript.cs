@@ -25,6 +25,9 @@ public class SubmissionLogicScript : MonoBehaviour
     public Camera viewCamera;
     public GameObject scoreUI;
 
+
+    public PauseMenu pauseMenu;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -120,6 +123,12 @@ public class SubmissionLogicScript : MonoBehaviour
 
         setWinPercentText(Convert.ToInt32(Math.Ceiling(matchPercentage)));
         setPenaltyText(penPercent);
+
+
+        if(matchPercentage >= winPercent)
+        {
+            WinLevel(Convert.ToInt32(Math.Ceiling(matchPercentage)));
+        }
     }
 
     [ContextMenu("Export Renders to PNG")]
@@ -210,6 +219,8 @@ public class SubmissionLogicScript : MonoBehaviour
     private void WinLevel(int percentage)
     {
         // Pause Game logic
+        pauseMenu.WinLevel(percentage);
+
 
         // Show UI Screen
 

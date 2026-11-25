@@ -5,11 +5,14 @@ using UnityEngine.UI;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pausePanel;
+    public GameObject winPanel;
     public string mainMenuScene = "MainMenu";
 
     public static bool IsPaused { get; private set; }
 
     public SettingsMenu settingsMenu;
+
+    public WinMenu winMenu;
 
     void Start()
     {
@@ -27,10 +30,18 @@ public class PauseMenu : MonoBehaviour
             {
                 if (settingsMenu != null && settingsMenu.IsOpen)
                     settingsMenu.Close();
+                else if (winMenu.IsOpen)
+                {
+                    //Do Nothing
+                }
                 else
                   Resume();
-            } else
+            } 
+            else
+            {                
+                pausePanel.SetActive(true);
                 Pause();
+            }
         }
     }
 
@@ -39,7 +50,6 @@ public class PauseMenu : MonoBehaviour
         IsPaused = true;
         Time.timeScale = 0f;
 
-        pausePanel.SetActive(true);
         SetCursorLocked(false);
     }
 
@@ -49,6 +59,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
 
         pausePanel.SetActive(false);
+        winPanel.SetActive(false);
         SetCursorLocked(true);
     }
 
@@ -81,5 +92,11 @@ public class PauseMenu : MonoBehaviour
         } else {
             Cursor.visible = true;
         }
+    }
+
+    public void WinLevel(int percentage)
+    {
+        Pause();
+        winMenu.Open(winPanel, percentage);
     }
 }
