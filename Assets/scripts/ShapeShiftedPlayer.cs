@@ -108,8 +108,16 @@ public class ShapeShiftedPlayer : MonoBehaviour
             transform.Rotate(new Vector3(pitch, -yaw, 0f), Space.World);
 
             //Theatre Resized
-            float scroll = Input.mouseScrollDelta.y * 0.1f ;
-            transform.localScale += new Vector3(scroll, scroll, scroll) * 0.2f; 
+            float scroll = Input.mouseScrollDelta.y;
+            if(scroll != 0)
+            {
+                float scaleSensitivity = 0.02f;
+                float scaleDelta = 1 + (scroll * scaleSensitivity);
+                transform.localScale = new Vector3(transform.localScale.x * scaleDelta, 
+                                                    transform.localScale.y * scaleDelta, 
+                                                    transform.localScale.z * scaleDelta);
+            }
+
         }
         
         if(playerController.CloneRequested)
@@ -127,6 +135,7 @@ public class ShapeShiftedPlayer : MonoBehaviour
             if(playerController.TeleportRequested == 2)
             {
                 transform.position = playerController.buttonLocation;
+                transform.localScale = playerController.GetOGScale();
             }
             playerController.TeleportRequested = 0;
             playerController.ChangeViews();

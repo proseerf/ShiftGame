@@ -1957,7 +1957,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2528803110764669474
 Transform:
   m_ObjectHideFlags: 0
@@ -5936,7 +5936,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1387817407784839772, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: copyable
       objectReference: {fileID: 0}
     - target: {fileID: 1511899501795799217, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
       propertyPath: m_LocalScale.x
@@ -6056,6 +6056,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -1387817407784839772, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3943143053989899980}
+    - targetCorrespondingSourceObject: {fileID: -1387817407784839772, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4027980319814583140}
   m_SourcePrefab: {fileID: -5645937942226959685, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
 --- !u!1 &1911295824374518647 stripped
 GameObject:
@@ -6084,6 +6087,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -7227129179611170996, guid: c5e92495cf094a64896fff3e891a962d, type: 3}
+--- !u!54 &4027980319814583140
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911295824374518647}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!4 &5817296888201531683 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2774220344278030320, guid: c5e92495cf094a64896fff3e891a962d, type: 3}

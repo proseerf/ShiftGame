@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public float minGroundNormalY = 0.5f;
 
     private float cooldown = 0f;
+    private Vector3 shapeOriginalScale;
 
     void Start()
     {
@@ -81,6 +82,11 @@ public class PlayerController : MonoBehaviour
     void RequestClone()
     {
         CloneRequested = true;
+    }
+
+    public Vector3 GetOGScale()
+    {
+        return shapeOriginalScale;
     }
 
     public void CreateStaticCopy(GameObject argGameObject, Transform argTransform)
@@ -260,6 +266,9 @@ public class PlayerController : MonoBehaviour
             copiedMeshFilter.mesh,
             targetObject.transform
         );
+
+        shapeOriginalScale = targetObject.transform.localScale;
+        Debug.Log(shapeOriginalScale);
 
         // Animate the morph, then create the final object
         StartCoroutine(FinishShapeShift(
