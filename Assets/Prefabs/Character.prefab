@@ -63,6 +63,10 @@ MonoBehaviour:
   theatreRestitutionForce: 5
   blobObject: {fileID: 8004481792018124800}
   MovementInput: {x: 0, y: 0, z: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  minGroundNormalY: 0.5
 --- !u!1 &2060078155703900875
 GameObject:
   m_ObjectHideFlags: 0

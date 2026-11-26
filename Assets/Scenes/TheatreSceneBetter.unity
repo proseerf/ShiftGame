@@ -183,6 +183,9 @@ MonoBehaviour:
   winPercent: 95
   winPercentText: {fileID: 1720546026}
   penaltyPercentText: {fileID: 1341685594}
+  viewCamera: {fileID: 0}
+  scoreUI: {fileID: 0}
+  pauseMenu: {fileID: 0}
 --- !u!4 &105611311
 Transform:
   m_ObjectHideFlags: 0
@@ -693,7 +696,7 @@ GameObject:
   - component: {fileID: 377330599}
   - component: {fileID: 377330598}
   - component: {fileID: 377330602}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: copyable
   m_Icon: {fileID: 0}
@@ -1051,7 +1054,7 @@ GameObject:
   - component: {fileID: 503243982}
   - component: {fileID: 503243981}
   - component: {fileID: 503243980}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CameraSwapTrigger
   m_TagString: CameraSwap
   m_Icon: {fileID: 0}
@@ -1470,7 +1473,7 @@ GameObject:
   - component: {fileID: 730390445}
   - component: {fileID: 730390444}
   - component: {fileID: 730390443}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Capsule
   m_TagString: copyable
   m_Icon: {fileID: 0}
@@ -2091,7 +2094,7 @@ GameObject:
   - component: {fileID: 1256097000}
   - component: {fileID: 1256096999}
   - component: {fileID: 1256096998}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (2)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -2992,7 +2995,7 @@ GameObject:
   - component: {fileID: 1667911468}
   - component: {fileID: 1667911467}
   - component: {fileID: 1667911466}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Ground
   m_Icon: {fileID: 0}

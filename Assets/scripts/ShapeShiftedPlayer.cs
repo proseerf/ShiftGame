@@ -187,17 +187,69 @@ public class ShapeShiftedPlayer : MonoBehaviour
     {
         Collider other = collision.collider;
 
-        if (other.CompareTag("Ground"))
-        {
-            groundContacts.Add(other);
-            grounded = true;
-        }
+        UpdateGroundContact(collision);
 
         if (other.CompareTag("copyable"))
         {
             copyableContacts.Add(other);
             UpdateSelectedObject();
         }
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        // Keep grounded state updated while touching a surface.
+        UpdateGroundContact(collision);
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        Collider other = collision.collider;
+
+        groundContacts.Remove(other);
+        grounded = groundContacts.Count > 0;
+
+        if (other.CompareTag("copyable"))
+        {
+            copyableContacts.Remove(other);
+            UpdateSelectedObject();
+        }
+    }
+
+    void UpdateGroundContact(Collision collision)
+    {
+        Collider other = collision.collider;
+
+        // Only consider objects on the Ground layer.
+        if ((playerController.groundLayer.value & (1 << other.gameObject.layer)) == 0)
+        {
+            groundContacts.Remove(other);
+            grounded = groundContacts.Count > 0;
+            return;
+        }
+
+        bool validGroundContact = false;
+
+        // Check all contact points for an upward-facing surface.
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            if (Vector3.Dot(contact.normal, Vector3.up) >= playerController.minGroundNormalY)
+            {
+                validGroundContact = true;
+                break;
+            }
+        }
+
+        if (validGroundContact)
+        {
+            groundContacts.Add(other);
+        }
+        else
+        {
+            groundContacts.Remove(other);
+        }
+
+        grounded = groundContacts.Count > 0;
     }
 
     public void OnTriggerEnter(Collider other)
@@ -221,22 +273,6 @@ public class ShapeShiftedPlayer : MonoBehaviour
             {
                 setTheatreMode(false);
             }
-        }
-    }
-    void OnCollisionExit(Collision collision)
-    {
-        Collider other = collision.collider;
-
-        if (other.CompareTag("Ground"))
-        {
-            groundContacts.Remove(other);
-            grounded = groundContacts.Count > 0;
-        }
-
-        if (other.CompareTag("copyable"))
-        {
-            copyableContacts.Remove(other);
-            UpdateSelectedObject();
         }
     }
 
