@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 377330599}
   - component: {fileID: 377330598}
   - component: {fileID: 377330602}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: copyable
   m_Icon: {fileID: 0}
@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 730390445}
   - component: {fileID: 730390444}
   - component: {fileID: 730390443}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Capsule
   m_TagString: copyable
   m_Icon: {fileID: 0}
@@ -432,6 +432,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 377330601}
+  - {fileID: 2039781820}
   - {fileID: 730390447}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

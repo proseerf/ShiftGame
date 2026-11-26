@@ -1,9 +1,6 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
-using System.Linq;
-using UnityEngine.InputSystem.XR;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer),typeof(EyeTracking))]
 public class SoftBodyBlob : MonoBehaviour
@@ -419,23 +416,57 @@ public class SoftBodyBlob : MonoBehaviour
     {
         grounded = false;
 
+        // Find the lowest point of the blob in world space
+        float lowestY = float.MaxValue;
+
         for (int i = 0; i < positions.Length; i++)
         {
             Vector3 worldPosition =
                 transform.TransformPoint(positions[i]);
 
+            if (worldPosition.y < lowestY)
+                lowestY = worldPosition.y;
+        }
+
+        // Only check particles near the bottom of the blob
+        for (int i = 0; i < positions.Length; i++)
+        {
+            Vector3 worldPosition =
+                transform.TransformPoint(positions[i]);
+
+            if (worldPosition.y > lowestY + particleRadius * 1.5f)
+                continue;
+
             Collider[] nearby = Physics.OverlapSphere(
                 worldPosition,
-                particleRadius
+                particleRadius,
+                playerController.groundLayer,
+                QueryTriggerInteraction.Ignore
             );
 
             foreach (Collider other in nearby)
             {
-                if (!other.CompareTag("Ground"))
-                    continue;
+                // Position the collision probe at this particle
+                collisionProbeObject.transform.position = worldPosition;
 
-                grounded = true;
-                break;
+                // Check the direction needed to separate the colliders
+                bool penetrating = Physics.ComputePenetration(
+                    collisionProbe,
+                    collisionProbeObject.transform.position,
+                    collisionProbeObject.transform.rotation,
+                    other,
+                    other.transform.position,
+                    other.transform.rotation,
+                    out Vector3 direction,
+                    out float distance
+                );
+
+                // Only count surfaces facing sufficiently upwards
+                if (penetrating && direction.y >= playerController.minGroundNormalY)
+                {
+                    grounded = true;
+                    return;
+                }
             }
         }
     }

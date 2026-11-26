@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 6608253672816724864}
   - component: {fileID: 8236528993272781348}
   - component: {fileID: 621556450020215187}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -1451,7 +1451,7 @@ GameObject:
   - component: {fileID: 8301846732514525157}
   - component: {fileID: 7970130879270097492}
   - component: {fileID: 7141997793622695542}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Visual
   m_TagString: CameraSwap
   m_Icon: {fileID: 0}
@@ -3557,7 +3557,7 @@ GameObject:
   - component: {fileID: 31301273175177570}
   - component: {fileID: 6715416571395884441}
   - component: {fileID: 4712616069080774335}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Ground
   m_Icon: {fileID: 0}

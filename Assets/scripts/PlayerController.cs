@@ -48,6 +48,10 @@ public class PlayerController : MonoBehaviour
     public bool CloneRequested {get; set; }
     public bool ReformRequested { get;  set; }
 
+    [Header("Ground Detection")]
+    [SerializeField] public LayerMask groundLayer;
+    [SerializeField] public float minGroundNormalY = 0.5f;
+
     private float cooldown = 0f;
 
     void Start()
