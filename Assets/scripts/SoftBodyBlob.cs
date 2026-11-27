@@ -1,6 +1,8 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
+using System;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer),typeof(EyeTracking))]
 public class SoftBodyBlob : MonoBehaviour
@@ -47,8 +49,16 @@ public class SoftBodyBlob : MonoBehaviour
 
     public GameObject selectedObject;
 
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI mustTransformText;
+    private float flashStart;
+    private int flashLength = 2;
+
     void Start()
     {
+        // Make text disappear
+        mustTransformText.alpha = 0;
+
         collisionProbeObject = new GameObject("Blob Collision Probe");
         collisionProbeObject.hideFlags = HideFlags.HideAndDontSave;
 
@@ -137,6 +147,8 @@ public class SoftBodyBlob : MonoBehaviour
         if(playerController.TeleportRequested != 0)
         {
             playerController.TeleportRequested = 0;
+            //Flash "you need to trasnform" text
+            StartCoroutine(FlashText());
         }
 
         // Solve constraints
@@ -605,6 +617,19 @@ public class SoftBodyBlob : MonoBehaviour
             positions[i] = transform.InverseTransformPoint(worldPosition);
         }
     }
+
+    private System.Collections.IEnumerator FlashText()
+    {
+        flashStart = Time.time;
+        // Animate the blob towards the target shape
+        while ((Time.time - flashStart) < flashLength)
+        {
+            float timeElapsed = Time.time - flashStart;
+            mustTransformText.alpha = ((flashLength) - timeElapsed) / (flashLength);
+            yield return null;
+        }
+    }
+
 
     void OnDestroy()
     {

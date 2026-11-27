@@ -8,7 +8,14 @@ public class ButtonPlayPress : MonoBehaviour
 
     public void PlayGame()
     {
-        SceneManager.LoadScene(sceneToLoad);
+        if(sceneToLoad == "this")
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneToLoad);
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
