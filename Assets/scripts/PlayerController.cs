@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
      public float theatreMaxSpeed = 5f;
      public float theatreMoveForce = 12f;
      public float theatreRestitutionForce = 5f;
+     public int copyLimit = 5;
 
     //hate this circular reference
     public GameObject blobObject;
@@ -107,6 +108,10 @@ public class PlayerController : MonoBehaviour
 
     public void CreateStaticCopy(GameObject argGameObject, Transform argTransform)
     {
+        if(staticCopies.Count >= copyLimit)
+        {
+            return;
+        }
         // Create a copy of the current GameObject
         GameObject copy = Instantiate(
             argGameObject,
@@ -163,7 +168,7 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.X) && inSubmissionRoom)
         {
             CloneRequested = true;
-            returnToButton();
+            //returnToButton();
         }
 
         if(Input.GetKeyDown(KeyCode.C) && inSubmissionRoom)
