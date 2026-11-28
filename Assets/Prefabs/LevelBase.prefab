@@ -1362,6 +1362,7 @@ MonoBehaviour:
   viewCamera: {fileID: 8851735259998250110}
   scoreUI: {fileID: 1058058347722106771}
   pauseMenu: {fileID: 3985393902723436942}
+  finished: 0
 --- !u!1 &1712797711979366564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,7 +1472,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 137}
+  m_AnchoredPosition: {x: 0, y: -211}
   m_SizeDelta: {x: 364.9185, y: 182.9492}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6856536984644919523
@@ -3682,7 +3683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

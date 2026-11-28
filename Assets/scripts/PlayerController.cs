@@ -52,6 +52,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public LayerMask groundLayer;
     [SerializeField] public float minGroundNormalY = 0.5f;
 
+
+
+    [Header("TUTORIAL")]
+    //if tutorial level, set to "1"
+    //  Step guide:
+    // 1 = tell how to move
+    // 2 = tell how to shapeshift
+    // 3 = tell how to reform
+    // 4 = tell how to move in theatre
+    // 5 = tell how to win
+    // 6 = tell how to duplicate when in theatre
+    public int tutorialStep = 0;
+
+    public TutorialLogic tutorialLogic;
+
+
     private float cooldown = 0f;
     private Vector3 shapeOriginalScale;
 

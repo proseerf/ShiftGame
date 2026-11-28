@@ -25,6 +25,7 @@ public class SoftBodyBlob : MonoBehaviour
     [Header("controller")]
     [SerializeField] private PlayerController playerController;
 
+
     private GameObject collisionProbeObject;
     private SphereCollider collisionProbe;
 
@@ -53,6 +54,9 @@ public class SoftBodyBlob : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mustTransformText;
     private float flashStart;
     private int flashLength = 2;
+
+    [Header("Tutorial")]
+    [SerializeField] private TutorialLogic tutorialLogic;
 
     void Start()
     {
@@ -505,6 +509,12 @@ public class SoftBodyBlob : MonoBehaviour
 
                 copyable = true;
                 selectedObject = other.gameObject;
+
+                if((tutorialLogic != null) && (playerController.tutorialStep == 2))
+                {
+                    tutorialLogic.howToCopy();
+                    playerController.tutorialStep = 4;
+                }
 
                 // Material currentMat = gameObject.GetComponent<MeshRenderer>().materials[1];
                 // selectedObject.GetComponent<MeshRenderer>().materials = 

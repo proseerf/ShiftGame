@@ -27,6 +27,7 @@ public class SubmissionLogicScript : MonoBehaviour
 
 
     public PauseMenu pauseMenu;
+    public bool finished = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -220,7 +221,7 @@ public class SubmissionLogicScript : MonoBehaviour
     {
         // Pause Game logic
         pauseMenu.WinLevel(percentage);
-
+        finished = true;
 
         // Show UI Screen
 

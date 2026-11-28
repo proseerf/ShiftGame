@@ -131,6 +131,8 @@ public class ShapeShiftedPlayer : MonoBehaviour
             {
                 playerController.buttonLocation = transform.position;
                 transform.position = playerController.theatreLocation;
+                playerController.tutorialLogic.howToNavigateTheatre();
+                
             }
             if(playerController.TeleportRequested == 2)
             {
