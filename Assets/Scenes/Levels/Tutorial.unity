@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -705,6 +705,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelBase
       objectReference: {fileID: 0}
+    - target: {fileID: 3394197205988966645, guid: 94a141ce17f338b41b4b74440eb3e4d2, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4390602799089486062, guid: 94a141ce17f338b41b4b74440eb3e4d2, type: 3}
       propertyPath: winPercent
       value: 85
@@ -773,6 +777,10 @@ PrefabInstance:
       propertyPath: tutorialLogic
       value: 
       objectReference: {fileID: 1234575019}
+    - target: {fileID: 7949665384980662555, guid: 94a141ce17f338b41b4b74440eb3e4d2, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8468360686514090924, guid: 94a141ce17f338b41b4b74440eb3e4d2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
