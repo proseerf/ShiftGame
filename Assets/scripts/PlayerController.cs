@@ -2,6 +2,7 @@
 using System.Reflection.Metadata;
 using UnityEngine;
 using UnityEngine.Android;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -39,6 +40,8 @@ public class PlayerController : MonoBehaviour
 
     public bool CopyRequested { get;  set; }
 
+    public bool RemoveCloneRequested { get;  set; }
+
     // 0 - No teleport requested
     // 1 - Go to Theatre Location
     // 2 - Go to Button Location
@@ -71,6 +74,8 @@ public class PlayerController : MonoBehaviour
     private float cooldown = 0f;
     private Vector3 shapeOriginalScale;
 
+    private Stack<GameObject> staticCopies = new Stack<GameObject>();
+
     void Start()
     {
         //user cam
@@ -93,11 +98,6 @@ public class PlayerController : MonoBehaviour
         {
             isCameraSwappable = false;
         }
-    }
-
-    void RequestClone()
-    {
-        CloneRequested = true;
     }
 
     public Vector3 GetOGScale()
@@ -136,6 +136,15 @@ public class PlayerController : MonoBehaviour
         copy.isStatic = true;
 
         CloneRequested = false;
+
+        staticCopies.Push(copy);
+    }
+
+    public void DestroyStaticCopy()
+    {
+        GameObject lastCopy = staticCopies.Pop();
+        Destroy(lastCopy);
+        RemoveCloneRequested = false;
     }
 
     void Update()
@@ -153,9 +162,15 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.X) && inSubmissionRoom)
         {
-            RequestClone();
+            CloneRequested = true;
             returnToButton();
         }
+
+        if(Input.GetKeyDown(KeyCode.C) && inSubmissionRoom)
+        {
+            RemoveCloneRequested = true;
+        }
+
         if(Input.GetKeyDown(KeyCode.Tab) && isCameraSwappable)
         {
             if(camera1.enabled == true)

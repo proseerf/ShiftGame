@@ -125,6 +125,11 @@ public class ShapeShiftedPlayer : MonoBehaviour
             playerController.CreateStaticCopy(gameObject, transform);
         }
 
+        if(playerController.RemoveCloneRequested)
+        {
+            playerController.DestroyStaticCopy();
+        }
+
         if(playerController.TeleportRequested != 0)
         {
             if(playerController.TeleportRequested == 1)

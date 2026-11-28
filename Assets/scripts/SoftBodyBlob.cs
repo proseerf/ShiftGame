@@ -147,6 +147,11 @@ public class SoftBodyBlob : MonoBehaviour
             playerController.CreateStaticCopy(gameObject, transform);
         }
 
+        if(playerController.RemoveCloneRequested)
+        {
+            playerController.DestroyStaticCopy();
+        }
+
         // Shouldnt teleport as a softbody
         if(playerController.TeleportRequested != 0)
         {
