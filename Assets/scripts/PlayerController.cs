@@ -377,8 +377,18 @@ public class PlayerController : MonoBehaviour
         newMeshFilter.sharedMesh =
             targetObject.GetComponent<MeshFilter>().sharedMesh;
 
-        newMeshRenderer.sharedMaterials =
-            currentObject.GetComponent<MeshRenderer>().sharedMaterials;
+        // give each objects submesh the blob material
+        Material blobMaterial =
+            currentObject.GetComponent<MeshRenderer>().sharedMaterial;
+
+        int partCount = newMeshFilter.sharedMesh.subMeshCount;
+        Material[] materials = new Material[partCount];
+
+        for (int i = 0; i < partCount; i++)
+        {
+            materials[i] = blobMaterial;
+        }
+        newMeshRenderer.sharedMaterials = materials;
 
         // Add controls
         ShapeShiftedPlayer newControls =
