@@ -103,7 +103,7 @@ public class TutorialLogic : MonoBehaviour
 
     private void howToDuplicate()
     {
-        textBox.text = "Press \"X\" to leave a body double in the shadows.\nYou can't undo this without resetting the level so be certain";
+        textBox.text = "Press \"X\" to leave a body double in the shadows.\nPress C to remove the most recent copy";
         tutorialStep = 7;
     }
 
