@@ -281,6 +281,10 @@ public class ShapeShiftedPlayer : MonoBehaviour
             {
                 setTheatreMode(true);
             }
+            if (other.name == "CameraSwapTrigger" && playerController.tutorialLogic != null)
+            {
+                playerController.tutorialLogic.setOnRug(true);
+            }
         }
     }
 
@@ -292,6 +296,10 @@ public class ShapeShiftedPlayer : MonoBehaviour
             if(other.name == "CameraSwapTriggerRoom")
             {
                 setTheatreMode(false);
+            }
+            if (other.name == "CameraSwapTrigger" && playerController.tutorialLogic != null)
+            {
+                playerController.tutorialLogic.setOnRug(false);
             }
         }
     }

@@ -18,6 +18,7 @@ public class TutorialLogic : MonoBehaviour
     private int tutorialStep;
     private bool rightClick = false;
     private bool scroll = false;
+    private bool reformed = false;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -38,7 +39,8 @@ public class TutorialLogic : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && tutorialStep == 3)
         {
             pauseMenu.Resume();
-            textBox.text = "Try heading over to the rug and pressing \"TAB\" to go to the audience view";
+            textBox.text = "Nice! \n Morph back into the cylinder prop and head over to the stage.";
+            reformed = true;
         }
         if(Input.GetMouseButton(1) && (tutorialStep == 4))
         {
@@ -81,9 +83,21 @@ public class TutorialLogic : MonoBehaviour
         tutorialStep = 2;
     }
 
+    // Step 3: swap the hint while standing on the rug (the camera swap trigger)
+    public void setOnRug(bool onRug)
+    {
+        if (tutorialStep != 3 || !reformed)
+            return;
+
+        if (onRug)
+            textBox.text = "Press \"TAB\" to go to the audience's view.";
+        else
+            textBox.text = "Nice! \n Morph back into the cylinder prop and head over to the stage.";
+    }
+
     public void howToNavigateTheatre()
     {
-        if(tutorialStep == 3)
+        if(tutorialStep == 3 && reformed)
         {
             textBox.text = "Use \"WASD\" to move Up/Down/Left/Right\nHold right click and move the mouse to rotate\nAnd use the scroll wheel to change size";
             tutorialStep = 4;
